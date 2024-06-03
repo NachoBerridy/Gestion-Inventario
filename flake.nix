@@ -1,7 +1,7 @@
 {
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
     systems.url = "github:nix-systems/default";
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
   };
@@ -32,6 +32,7 @@
                   dbaeumer.vscode-eslint
                   usernamehw.errorlens
                   ms-vsliveshare.vsliveshare
+                  esbenp.prettier-vscode
                 ];
               in
               (vscode-with-extensions.override {
@@ -46,6 +47,7 @@
               buildInputs = with pkgs;[
                 nodejs_20
                 sqlite
+                dbeaver-bin
               ] ++ [ codeWithExtensions ];
 
             };
