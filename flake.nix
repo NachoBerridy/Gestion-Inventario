@@ -33,6 +33,7 @@
                   usernamehw.errorlens
                   ms-vsliveshare.vsliveshare
                   esbenp.prettier-vscode
+                  humao.rest-client
                 ];
               in
               (vscode-with-extensions.override {
