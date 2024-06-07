@@ -4,7 +4,7 @@ import { open, Database } from "sqlite";
 import sqlite3 from "sqlite3";
 
 // model
-export interface Proveedor {
+export interface IProveedor {
   id: number;
   nombre: string;
   correo: string;
@@ -15,12 +15,15 @@ export interface Proveedor {
 // querys
 
 async function getProveedores(
-  lastId: number | null = null,
+  lastId: number = 0,
   offset: number = 10
-): Promise<Proveedor[]> {
+): Promise<IProveedor[]> {
   const db = await getDbConnection();
 
-  const result = await db.all<Proveedor[]>("select * from Proveedor");
+  const result = await db.all<IProveedor[]>(
+    "select * from Proveedor where id > ?1 order by id limit ?2",
+    [lastId, offset]
+  );
 
   return result;
 }
@@ -30,7 +33,16 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "GET") {
-    const proveedores = await getProveedores();
+    const { lastId, pageSize } = req.query;
+    const parsedLastId = Number(lastId);
+    const parsedPageSize = Number(pageSize);
+
+    console.log(parsedLastId, parsedPageSize);
+
+    const proveedores = await getProveedores(
+      Number.isNaN(parsedLastId) ? undefined : parsedLastId,
+      Number.isNaN(parsedPageSize) ? undefined : parsedPageSize
+    );
 
     res.status(200).json(proveedores);
   }

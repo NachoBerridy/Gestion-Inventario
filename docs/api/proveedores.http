@@ -3,3 +3,5 @@
 
 ###
 GET {{base-url}}/proveedores
+?pageSize=5
+&lastId=5

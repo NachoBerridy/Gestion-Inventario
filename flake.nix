@@ -34,6 +34,7 @@
                   ms-vsliveshare.vsliveshare
                   esbenp.prettier-vscode
                   humao.rest-client
+                  bradlc.vscode-tailwindcss
                 ];
               in
               (vscode-with-extensions.override {
