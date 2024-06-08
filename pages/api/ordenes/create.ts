@@ -20,12 +20,15 @@ if (!db) {
     return res.status(405).end(`Method ${method} Not Allowed`);
   }
   try {
-    const { idProveedorArticulo, cantidad, precioUnitario, fechaOrden}: { idProveedorArticulo: number, cantidad: number, precioUnitario: number, fechaOrden: string } = req.body;
+    const { idProveedorArticulo, cantidad, fechaOrden}: { idProveedorArticulo: number, cantidad: number, fechaOrden: string } = req.body;
+    const { precioUnitario } = await db.get(
+      "SELECT precio_unidad as precioUnitario FROM Precio WHERE articulo_proveedor_id = ? and fecha_fin = ?",
+      [idProveedorArticulo, null]
+    );
     const result = await db.run(
       "INSERT INTO Orden_Compra (articulo_proveedor_id, cantidad, total) VALUES (?, ?, ?)",
       [idProveedorArticulo, cantidad, precioUnitario*cantidad]
     );
-    // Insert in the Orden_Compra_Estado table
     await db.run(
       "INSERT INTO Orden_Compra_Estado (orden_compra_id, estado, fecha) VALUES (?, ?, ?)",
       [result.lastID, 'Pendiente', fechaOrden]
