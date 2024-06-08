@@ -18,16 +18,17 @@ export default async function handler(
         if (req.method !== "GET") {
             return res.status(405).json({ message: "Method Not Allowed" });
         }
+
         const id = req.query.id;
 
-        const articulos = await db.all(`
-            SELECT Articulo.id, nombre, stock, precio FROM Articulo
-            join Articulo_Precio_Venta on Articulo.id = Articulo_Precio_Venta.articulo_id
-            where 
-                Articulo.id = ?
-                and Articulo_Precio_Venta.fecha_fin is NULL 
+        const sale = await db.all(`
+            SELECT Venta.id, Articulo.nombre, Venta.cantidad, Venta.fecha FROM Venta
+            join Articulo on Venta.articulo_id = Articulo.id
+            where Venta.id = ?
             `,[id]);
-        return res.status(200).json(articulos);
+        
+        return res.status(200).json(sale);
+        
     }
     catch (error: any) {
         return res.status(500).json({ message: error.message });

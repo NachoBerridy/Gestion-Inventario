@@ -26,9 +26,9 @@ export default async function handler(
             SELECT Articulo.id, nombre, stock, precio FROM Articulo
             join Articulo_Precio_Venta on Articulo.id = Articulo_Precio_Venta.articulo_id
             where 
-                Articulo.id = ${id} 
-                and Articulo_Precio_Venta.fecha_inicio = (select max(fecha_inicio) from Articulo_Precio_Venta where articulo_id = ${id})
-            `);
+                Articulo.id = ?
+                and Articulo_Precio_Venta.fecha_inicio = (select max(fecha_inicio) from Articulo_Precio_Venta where articulo_id = ?)
+            `,[id]);
         if (!articulo) {
             return res.status(404).json({ message: `Articulo ${id} not found` });
         }
