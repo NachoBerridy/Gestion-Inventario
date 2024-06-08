@@ -22,12 +22,23 @@ if (!db) {
   }
   try {
     const result = await db.get(
-      `SELECT Articulo.nombre as Articulo, Proveedor.nombre as Proveedor, cantidad, Orden_Compra.fecha, plazo_entrega, estado, total FROM Orden_Compra 
+      `SELECT 
+        Articulo.nombre as article,
+        Proveedor.nombre as provider,
+        Articulo_Proveedor.id as articleProviderId,
+        cantidad as amount, 
+        Orden_Compra_Estado.fecha as date, 
+        plazo_entrega as deliveryTerm, 
+        precio_unidad as price,
+        estado as state, 
+        total 
+      FROM Orden_Compra 
       join Articulo_Proveedor on Orden_Compra.articulo_proveedor_id = articulo_proveedor.id
       join Articulo on Articulo_Proveedor.articulo_id = articulo.id
       join Proveedor on Articulo_Proveedor.proveedor_id = proveedor.id
-      join Orden_Compra_Estado on ${id} = Orden_Compra_Estado.orden_compra_id
-      WHERE Orden_Compra.id = ${id}`
+      join Precio on Articulo_Proveedor.id = Precio.articulo_proveedor_id
+      join Orden_Compra_Estado on Orden_Compra.id = Orden_Compra_Estado.orden_compra_id
+      WHERE Orden_Compra.id = ?`, id
     );
     return res.json(result);
   } catch (error : any) {
