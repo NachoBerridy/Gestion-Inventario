@@ -88,7 +88,6 @@ create table if not exists Orden_Compra (
     id integer primary key,
     articulo_proveedor_id integer,
     cantidad integer,
-    fecha text,
     total integer,
     foreign key (articulo_proveedor_id) references Articulo_Proveedor(id)
 );
