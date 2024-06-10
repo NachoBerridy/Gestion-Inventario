@@ -37,7 +37,7 @@ export default async function handler(
         }
 
         //verific aque no existan ordenens pendientes ni enviadas, tiene que estar canceladas o recibidas, las ordenes de compran están relacionadas con articulo_proveedor, que a su vez está relacionado con articulo
-        const orders = await db.get(
+        const orders = await db.all(
             `SELECT * FROM Articulo 
             join Articulo_Proveedor on Articulo.id = Articulo_Proveedor.articulo_id
             join Orden_Compra on Articulo_Proveedor.id = Orden_Compra.articulo_proveedor_id
@@ -54,6 +54,7 @@ export default async function handler(
             "DELETE FROM Articulo WHERE id = ?",
             [id]
         );
+
         const result2 = await db.run(
             "DELETE FROM Articulo_Precio_Venta WHERE articulo_id = ?",
             [id]

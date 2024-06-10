@@ -20,7 +20,7 @@ export default function Card({articulo}: {articulo: Articulo}) {
             case  articulo.stock_seguridad && articulo.punto_pedido && articulo.stock < articulo.punto_pedido && articulo.stock > articulo.stock_seguridad:
                 setColor("orange")
                 break;
-            case articulo.stock_seguridad && articulo.stock < articulo.stock_seguridad:
+            case articulo.stock_seguridad && articulo.stock <= articulo.stock_seguridad:
                 setColor("red")
                 break;
             default:
