@@ -21,7 +21,7 @@ if (!db) {
     return res.status(405).end(`Method ${method} Not Allowed`);
   }
   try {
-    const { idProveedorArticulo, cantidad, fechaOrden, estado ,id}: { idProveedorArticulo: number, cantidad: number, fechaOrden: string, estado:string, id:string } = req.body;
+    const { idProveedorArticulo, cantidad, fecha, estado ,id}: { idProveedorArticulo: number, cantidad: number, fecha: string, estado:string, id:string } = req.body;
     const { precioUnitario } = await db.get(
       "SELECT precio_unidad as precioUnitario FROM Precio WHERE articulo_proveedor_id = ? and fecha_fin = ?",
       [idProveedorArticulo, null]
@@ -32,7 +32,7 @@ if (!db) {
     );
     await db.run(
       "UPDATE Orden_Compra_Estado SET estado = ?, fecha = ? WHERE orden_compra_id = ?",
-      [estado, fechaOrden, id]
+      [estado, fecha, id]
     );
 
     return res.json(result);

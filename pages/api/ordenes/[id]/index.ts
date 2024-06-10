@@ -4,33 +4,18 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<any>,
-) {
-if (!db) {
-  db = await open({
-    filename: "./db/test.db",
-    driver: sqlite3.Database,
-  });
-}
-  const { method } = req;
-  const { id } = req.query;
-  if(method !== "GET") {
-    return res.status(405).end(`Method ${method} Not Allowed`);
-  }
+const getOrden = async (id: string, db: Database<sqlite3.Database, sqlite3.Statement>) => {
   try {
-    const result = await db.get(
+    return await db.get(
       `SELECT 
-        Articulo.nombre as article,
-        Proveedor.nombre as provider,
+        Articulo.nombre as articulo,
+        Proveedor.nombre as proveedor,
         Articulo_Proveedor.id as articleProviderId,
-        cantidad as amount, 
-        Orden_Compra_Estado.fecha as date, 
-        plazo_entrega as deliveryTerm, 
-        precio_unidad as price,
-        estado as state, 
+        cantidad as cantidad,
+        Orden_Compra_Estado.fecha as fecha, 
+        plazo_entrega as plazo,
+        precio_unidad as precio,
+        estado,
         total 
       FROM Orden_Compra 
       join Articulo_Proveedor on Orden_Compra.articulo_proveedor_id = articulo_proveedor.id
@@ -40,8 +25,51 @@ if (!db) {
       join Orden_Compra_Estado on Orden_Compra.id = Orden_Compra_Estado.orden_compra_id
       WHERE Orden_Compra.id = ?`, id
     );
-    return res.json(result);
   } catch (error : any) {
-    return res.status(500).json({ message: error.message });
+    throw error;
+  }
+}
+
+const deleteOrden = async (id: string, db: Database<sqlite3.Database, sqlite3.Statement>) => {
+  try {
+    await db.run(
+      "DELETE FROM Orden_Compra WHERE id = ?", id
+    ); 
+    await db.run("DELETE FROM Orden_Compra_Estado WHERE orden_compra_id = ?", id);
+  } catch (error : any) {
+    throw error;
+  }
+}
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<any>,
+) {
+  if (!db) {
+    db = await open({
+      filename: "./db/test.db",
+      driver: sqlite3.Database,
+    });
+  }
+  const { method } = req;
+  const { id } = req.query;
+
+  switch (method) {
+    case "GET":
+      try {
+        const result = await getOrden(id as string, db);
+        return res.json(result);
+      } catch (error : any) {
+        return res.status(500).json({ message: error.message });
+      }
+    case "DELETE":
+      try {
+        await deleteOrden(id as string, db);
+        return res.status(200).end();
+      } catch (error : any) {
+        return res.status(500).json({ message: error.message });
+      }
+    default:
+      return res.status(405).end(`Method ${method} Not Allowed`);
   }
 }
