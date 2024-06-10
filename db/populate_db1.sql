@@ -1,15 +1,28 @@
 -- Insertar datos en la tabla Artículo
-INSERT INTO Articulo (nombre, stock) VALUES
-('Articulo A', 100),
-('Articulo B', 200),
-('Articulo C', 300),
-('Articulo D', 150),
-('Articulo E', 250),
-('Articulo F', 350),
-('Articulo G', 400),
-('Articulo H', 450),
-('Articulo I', 500),
-('Articulo J', 550);
+INSERT INTO Articulo (nombre, stock, stock_seguridad, punto_pedido, modelo_inventario) VALUES
+('Articulo A', 15, 10, 20, 'LOTE FIJO'),
+('Articulo B', 15, 20, 40, 'LOTE FIJO'),
+('Articulo C', 300, 30, 60, 'INTERVALO FIJO'),
+('Articulo D', 400, 40, 80, 'INTERVALO FIJO'),
+('Articulo E', 50, 50, 100, 'LOTE FIJO'),
+('Articulo F', 600, 60, 120, 'LOTE FIJO'),
+('Articulo G', 700, 70, 140, 'INTERVALO FIJO'),
+('Articulo H', 800, 80, 160, 'LOTE FIJO'),
+('Articulo I', 900, 90, 180, 'LOTE FIJO'),
+('Articulo J', 1000, 100, 200, 'LOTE FIJO'); 
+
+--Insertar datos en la tabla Articulo_Precio_Venta
+INSERT INTO Articulo_Precio_Venta (articulo_id, precio, fecha_inicio, fecha_fin) VALUES
+(1, 100, '2024-01-01', null),
+(2, 200, '2024-02-01', null),
+(3, 300, '2024-03-01', null),
+(4, 400, '2024-04-01', null),
+(5, 500, '2024-05-01', null),
+(6, 600, '2024-06-01', null),
+(7, 700, '2024-07-01', null),
+(8, 800, '2024-08-01', null),
+(9, 900, '2024-09-01', null),
+(10, 1000, '2024-10-01', null);
 
 -- Insertar datos en la tabla Proveedor
 INSERT INTO Proveedor (nombre, correo, telefono, direccion) VALUES
