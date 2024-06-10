@@ -32,7 +32,7 @@ export default async function handler(
       filename: "./db/test.db",
       driver: sqlite3.Database,
     });
-
+    console.log("db", db);
     const ordenes = await db.all(`
       SELECT 
         Orden_Compra.id as id,
@@ -51,7 +51,6 @@ export default async function handler(
         join Proveedor on Articulo_Proveedor.proveedor_id = Proveedor.id
         join Precio on Articulo_Proveedor.id = Precio.articulo_proveedor_id
       `);
-
     res.status(200).json(ordenes);
   } catch (error:any) {
     res.status(500).json({ message: error.message });
