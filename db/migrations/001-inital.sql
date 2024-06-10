@@ -68,7 +68,7 @@ create table if not exists Precio (
     articulo_proveedor_id integer,
     precio_unidad float,
     cantidad_min integer,
-    contidad_max integer,
+    cantidad_max integer,
     fecha_inicio text,
     fecha_fin text,
     foreign key (articulo_proveedor_id) references Articulo_Proveedor(id)

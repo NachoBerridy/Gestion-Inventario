@@ -8,26 +8,47 @@ import React from "react";
 export default function Orden(){
 
 
-  const [ordenes, setOrdenes] = useState<IOrdenCompra[]>([]);
+  const [orders, setOrders] = useState<IOrdenCompra[]>([]);
+  const [orderId, setOrderId] = useState<number>(0);
+  const [showEdit, setShowEdit] = useState<boolean>(false);
+  
+  const selectOrder = (id: number) => {
+    setOrderId(id);
+    setShowEdit(true);
+  }
+
+  const fetchOrdenes = async () => {
+    try {
+      const response = await axios.get("/api/ordenes");
+      setOrders(response.data);
+      setOrderId(response.data[0]?.id);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const deleteOrder = async (id: number) => {
+    try {
+      const response = await axios.delete(`/api/ordenes/${id}`);
+      fetchOrdenes();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+
 
   useEffect(() => {
-
-    const fetchOrdenes = async () => {
-        try {
-          const response = await axios.get("/api/ordenes");
-          setOrdenes(response.data);
-        } catch (error) {
-          console.error(error);
-        }
-    }
 
     fetchOrdenes();
   }, []);
 
 
 
+
+
   return (
-    <div className="w-screen h-screen bg-gray-600 flex justify-center items-center">
+    <div className="w-screen h-screen bg-gray-600 flex justify-center items-center text-blackcon">
       <table className="w-3/4 bg-white text-black p-4 m-4 rounded-lg shadow-lg">
         <thead>
           <tr className="bg-gray-200 text-gray-800 text-lg font-semibold uppercase" >
@@ -42,11 +63,19 @@ export default function Orden(){
           </tr>
         </thead>
         <tbody>
-          {ordenes.map((orden) => (
-            <CardOrdenDeCompra orden={orden} key={orden.id} />
+          {orders.map((orden) => (
+            <CardOrdenDeCompra 
+              key={orden.id} 
+              orden={orden} 
+              selectOrder={selectOrder}
+              deleteOrder={deleteOrder}
+            />
           ))}
         </tbody>
       </table>
+      {
+        (orderId!==0) && <EditarOrdenDeCompra orderId={orderId} show={showEdit} setShow={setShowEdit} />
+      }
     </div>
   )
 }
