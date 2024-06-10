@@ -13,7 +13,8 @@ export interface IProveedor {
 // querys
 async function getProveedores(
   limit: number = 10,
-  offset: number = 0
+  offset: number = 0,
+  queryName: string | undefined
 ): Promise<{
   rows: IProveedor[];
   totalRows: number;
@@ -22,12 +23,33 @@ async function getProveedores(
 
   const totalRows =
     (
-      await db.get<{ "count(id)": number }>("select count(id) from proveedor")
+      await db.get<{ "count(id)": number }>(
+        `
+      select count(id) 
+      from proveedor
+      where nombre like 
+        case
+          when ?1 is not null and length(?1) > 0 then concat('%',?1,'%')
+          else '%'
+        end      
+      `,
+        [queryName]
+      )
     )?.["count(id)"] ?? 0;
 
   const rows = await db.all<IProveedor[]>(
-    "select * from Proveedor limit ?1 offset ?2",
-    [limit, offset]
+    `
+    select * 
+    from proveedor 
+    where nombre like 
+      case
+        when ?3 is not null and length(?3) > 0 then concat('%',?3,'%')
+        else '%'
+      end
+    limit ?1 
+    offset ?2
+    `,
+    [limit, offset, queryName]
   );
 
   return {
@@ -41,9 +63,10 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "GET") {
-    const { pageSize, offset } = req.query;
+    const { pageSize, offset, query } = req.query;
     const parsedOffset = Number(offset);
     const parsedPageSize = Number(pageSize);
+    const parsedQuery = Array.isArray(query) ? query[0] : query;
 
     const LIMIT_PAGESIZE = 10;
 
@@ -57,7 +80,8 @@ export default async function handler(
 
     const proveedores = await getProveedores(
       Number.isNaN(parsedPageSize) ? undefined : parsedPageSize,
-      Number.isNaN(parsedOffset) ? undefined : parsedOffset
+      Number.isNaN(parsedOffset) ? undefined : parsedOffset,
+      parsedQuery
     );
 
     res.status(200).json(proveedores);
