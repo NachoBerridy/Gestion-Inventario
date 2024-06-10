@@ -20,7 +20,7 @@ export default async function handler(
         }
 
         const articulos = await db.all(`
-            SELECT Articulo.id, nombre, stock, precio FROM Articulo
+            SELECT Articulo.id, nombre, stock, precio, stock_seguridad, punto_pedido, lote_optimo, modelo_inventario FROM Articulo
             join Articulo_Precio_Venta on Articulo.id = Articulo_Precio_Venta.articulo_id
             where 
                 Articulo_Precio_Venta.fecha_fin is NULL

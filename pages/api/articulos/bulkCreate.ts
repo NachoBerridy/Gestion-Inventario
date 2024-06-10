@@ -3,22 +3,25 @@ import { Database, open } from "sqlite";
 import { NextApiRequest, NextApiResponse } from "next";
 
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
-
+const MODELOINVENTARIO = 'LOTE FIJO' // Sacar de tabla configs o del env
 const bulkCreatePrueba = [
     {
         "nombre": "articulo 1",
         "precio": 234,
-        "stock": 23
+        "stock": 23,
+        "modeloInventario": "LOTE FIJO"
     },
     {
         "nombre": "articulo 2",
         "precio": 415,
-        "stock": 17
+        "stock": 17,
+        "modeloInventario": "INTERVALO FIJO"
     },
     {
         "nombre": "articulo 3",
         "precio": 267,
-        "stock": 30
+        "stock": 30,
+        "modeloInventario": "INTERVALO FIJO"
     },
     {
         "nombre": "articulo 4",
@@ -75,10 +78,11 @@ export default async function handler(
         let ids = [];
 
         for (const articulo of bulkCreatePrueba) {
-            const { nombre, stock, precio } = articulo;
+            let { nombre, stock, precio, modeloInventario } = articulo;
+            if (!modeloInventario) modeloInventario = MODELOINVENTARIO;
             const result = await db.run(
-                `INSERT INTO Articulo (nombre, stock) VALUES (?, ?)`,
-                [nombre, stock]
+                `INSERT INTO Articulo (nombre, stock,modelo_inventario) VALUES (?, ?, ?)`,
+                [nombre, stock,modeloInventario]
             );
             const date = new Date();
             const result2 = await db.run(

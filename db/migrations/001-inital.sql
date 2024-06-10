@@ -6,7 +6,11 @@
 create table if not exists Articulo (
     id integer primary key,
     nombre text,
-    stock integer
+    stock integer,
+    stock_seguridad integer,
+    punto_pedido integer,
+    lote_optimo integer,
+    modelo_inventario text
 );
 
 --VENTA

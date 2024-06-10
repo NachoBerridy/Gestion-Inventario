@@ -19,7 +19,7 @@ export default async function handler(
             return res.status(405).json({ message: "Method Not Allowed" });
         }
 
-        const { nombre, stock ,precio, id}:{nombre:String, stock:Number,precio:Number, id:Number} = req.body;
+        const { nombre, stock ,precio, id,modeloInventario}:{nombre:String, stock:Number,precio:Number, id:Number,modeloInventario:string} = req.body;
         !id && res.status(400).json({ message: "id is required" });
 
         const articulo = await db.all(`
@@ -33,11 +33,13 @@ export default async function handler(
             return res.status(404).json({ message: `Articulo ${id} not found` });
         }
 
+        //TODO agregar modelo de inventario,stock de seg, y punto de pedido. agregar tambien en la tabla de articulo
         const result = await db.run(
-            "UPDATE Articulo SET nombre = ?, stock = ? WHERE id = ?",
-            [nombre, stock, id]
+            "UPDATE Articulo SET nombre = ?, stock = ? ,modelo_inventario = ? WHERE id = ?",
+            [nombre, stock, id,modeloInventario]
         );
-        console.log(articulo[0].precio);
+
+        //si cambio el precio, se inserta un nuevo precio y se cierra el anterior
         if (precio !== articulo[0].precio) {
             console.log("precio diferente");
             const date = new Date();
