@@ -1,8 +1,11 @@
 import { IOrdenCompra } from "@/pages/api/ordenes";
 import { PencilSquareIcon, CheckIcon, XMarkIcon, PaperAirplaneIcon, TrashIcon } from "@heroicons/react/24/outline";
 import formatPrice from "@/utils/formatPrice";
+import { useState } from "react";
 
 export default function CardOrdenDeCompra({orden, selectOrder, deleteOrder}:{orden:IOrdenCompra, selectOrder: (id:number) => void, deleteOrder: (id:number) => void}) {
+  
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
 
   const calcularFecha = (fecha: string, plazo: string) => {
     const fechaEnviada = new Date(fecha);
@@ -34,7 +37,19 @@ export default function CardOrdenDeCompra({orden, selectOrder, deleteOrder}:{ord
           orden.estado === "Enviada" ? <PaperAirplaneIcon className="h-6 w-6 text-blue-800 cursor-pointer" /> :
           <div className="flex gap-1">
             <PencilSquareIcon className="h-6 w-6 cursor-pointer" onClick={() => selectOrder(orden.id)} />
-            <TrashIcon className="h-6 w-6 cursor-pointer" onClick={() => deleteOrder(orden.id)} />
+            <TrashIcon className="h-6 w-6 cursor-pointer" onClick={() => setShowDeleteModal(true)} />
+          </div>
+        }
+        {
+          showDeleteModal && 
+          <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-50 flex items-center justify-center" onClick={() => setShowDeleteModal(false)}>
+            <div className="bg-white p-4 rounded-md flex flex-col gap-4 justify-center">
+              <h2>¿Estás seguro de eliminar la orden de compra?</h2>
+              <div className="flex justify-center gap-2">
+                <button className="bg-red-500 text-white p-2 rounded-md" onClick={() => deleteOrder(orden.id)}>Eliminar</button>
+                <button className="bg-gray-500 text-white p-2 rounded-md" onClick={() => setShowDeleteModal(false)}>Cancelar</button>
+              </div>
+            </div>
           </div>
         }
       </td>
