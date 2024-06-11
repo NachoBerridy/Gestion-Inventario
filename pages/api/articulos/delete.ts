@@ -33,7 +33,7 @@ export default async function handler(
             );
 
         if (!articulo) {
-            return res.status(404).json({ message: `Articulo ${id} not found` });
+            return res.status(404).json({ message: `Articulo ${id} no encontrado` });
         }
 
         //verific aque no existan ordenens pendientes ni enviadas, tiene que estar canceladas o recibidas, las ordenes de compran están relacionadas con articulo_proveedor, que a su vez está relacionado con articulo
@@ -47,7 +47,7 @@ export default async function handler(
             );
 
         if (orders && orders.length > 0) {
-            return res.status(400).json({ message: `Articulo ${id} has pending orders` });
+            return res.status(400).json({ message: `El articulo tiene ordenes en curso` });
         }
 
         const result = await db.run(
@@ -60,7 +60,7 @@ export default async function handler(
             [id]
         );
 
-        return res.status(200).json({ message: `Articulo ${id} deleted` });
+        return res.status(200).json({ message: `El articulo ha sido eliminado` });
     }
     catch (error: any) {
         return res.status(500).json({ message: error.message });
