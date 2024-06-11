@@ -1,3 +1,4 @@
+import CreateProveedor from "@/components/CreateProveedor";
 import Proveedor from "@/components/Proveedor";
 import { FormEvent, useState } from "react";
 import useSWR from "swr";
@@ -9,6 +10,7 @@ const PAGE_SIZE = 5;
 export default function Proveedores() {
   const [page, setPage] = useState<number>(1);
   const [query, setQuery] = useState<string>("");
+  const [openCreateNew, setOpenCreateNew] = useState(false);
 
   const { data, error, isLoading } = useSWR<{
     rows: IProveedor[];
@@ -39,7 +41,6 @@ export default function Proveedores() {
 
   function handleSearchSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log(e);
     const form = e.currentTarget;
     const formData = new FormData(form);
     const queryValue = formData.get("queryValue");
@@ -82,10 +83,32 @@ export default function Proveedores() {
         </form>
         <div>SELECTOR</div>
       </div>
-      <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-10 overflow-auto">
         {data?.rows.map((p) => (
           <Proveedor key={p.id} proveedor={p} />
         ))}
+      </div>
+      <CreateProveedor
+        open={openCreateNew}
+        close={() => setOpenCreateNew(false)}
+      />
+      <div className="w-full flex justify-end gap-3 mt-auto pr-10">
+        <button onClick={() => setOpenCreateNew(true)}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="size-6 hover:stroke-purple-500"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+            />
+          </svg>
+        </button>
       </div>
 
       <div className="w-full flex justify-end gap-3 mt-auto">
