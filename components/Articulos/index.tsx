@@ -3,23 +3,14 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Articulo } from "../../pages/api/articulos";
 import SearchBar from "../Search";
+import { toast } from "react-toastify";
 export default function Articulos() {
 
     const [articulos, setArticulos] = useState<Articulo[]>([]);
     const [search, setSearch] = useState<string>("");
-    // const [filteredArticleByName, setFilteredArticleByName] = useState<Articulo[]>([]);
     const [filteredArticle, setFilteredArticle] = useState<Articulo[]>([]);
-    // const [filteredArticleByStock, setFilteredArticleByStock] = useState<Articulo[]>([]);
     const [filter, setFilter] = useState<string>("");
-    // const [show, setShow] = useState<boolean>(false);
 
-    // const searchArticle = async (search: string) => {
-    //     const filtered = articulos.filter((articulo) => articulo.nombre.toLowerCase().includes(search.toLowerCase()));
-    //     if (search === "") {
-    //         setFilteredArticleByName(articulos)
-    //     }
-    //     setFilteredArticleByName(filtered);
-    // }
     const filterArticlebyStock = (articulos: Articulo[], filter: string) => {
         if (filter === "stock seguridad") {
             const filtered = articulos.filter((articulo) => articulo.stock <= articulo.stock_seguridad);
@@ -42,40 +33,39 @@ export default function Articulos() {
 
     }
     
-    // const searchArticleByStock = async (filter: string) => {
-    //     if (filter === "stock seguridad") { 
-    //         const filtered = articulos.filter((articulo) => articulo.stock <= articulo.stock_seguridad);
-    //         setFilteredArticleByStock(filtered);
-    //     }
-    //     if (filter === "punto pedido") {
-    //         const filtered = articulos.filter((articulo) => articulo.stock <= articulo.punto_pedido);
-    //         setFilteredArticleByStock(filtered);
-    //     }
-    // }
+    const fetchData = async () => {
+        const response = await axios.get("/api/articulos/all");
+        setArticulos(response.data);
+        setFilteredArticle(response.data)
+    }
+
+    const deleteArticle = async (id:number) => {
+        try {
+            const response = await axios.delete(`/api/articulos/delete`,
+            {
+                data: {
+                    id: id
+                }
+            });
+            toast.success(response.data.message);
+            fetchData();
+        } catch (error:any) {
+            //if code 500
+            if (error.response.status === 500) {
+                toast.error("Error al eliminar el articulo");
+            } else {
+                toast.error(error.response.data.message);
+            }
+        }
+    }
 
     useEffect(() => {
-        const fetchData = async () => {
-            const response = await axios.get("/api/articulos/all");
-            setArticulos(response.data);
-            setFilteredArticle(response.data)
-            // setFilteredArticleByName(response.data)
-            // setFilteredArticleByStock(response.data)
-        }
         fetchData();
     }, []);
+
     useEffect(() => {
         searchArticle(search,filter);
     }, [search,filter]);
-
-    // useEffect(()=>{
-    //     console.log(search)
-    //     searchArticle(search);
-    // },[search])
-
-    // useEffect(()=>{
-    //     console.log(filter)
-    //     searchArticleByStock(filter);
-    // },[filter])
 
     return (
         <div className="container bg-gray-100">
@@ -95,7 +85,7 @@ export default function Articulos() {
             <div className="row">
                 <div className="">
                     {filteredArticle.map((articulo) => {
-                        return <Card articulo={articulo} key={articulo.id} />
+                        return <Card articulo={articulo} key={articulo.id} deleteArticle={deleteArticle}/>
                     })}
                 </div>
             </div>

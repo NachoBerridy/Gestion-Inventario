@@ -1,12 +1,14 @@
 import {Articulo} from "../../../pages/api/articulos"
-import { PlusIcon, PencilSquareIcon} from "@heroicons/react/24/outline";
+import { PlusIcon, PencilSquareIcon, TrashIcon} from "@heroicons/react/24/outline";
 import { useState,useEffect } from "react";
+import axios from "axios";
 
 
-export default function Card({articulo}: {articulo: Articulo}) {
+export default function Card({articulo, deleteArticle}: {articulo: Articulo, deleteArticle: (id: number) => void}) {
     
     const [color, setColor] = useState<string>("white")
     const [show, setShow] = useState<boolean>(false)
+    const [deleteModal, setDeleteModal] = useState<boolean>(false)
 
     //funcion para elegir color, si el stock esta por encima de punto de pedido verde, si está en el punto de pedido amarillo, si está por debajo pero por encima de stock de seguridad naranja, si está por debajo de stock de seguridad rojo
     const changeColor = () => {
@@ -28,8 +30,9 @@ export default function Card({articulo}: {articulo: Articulo}) {
                 break;
         }
     }
+
+
     useEffect(() => {
-        console.log(articulo)
         changeColor()
     }, [articulo])
     
@@ -45,6 +48,7 @@ export default function Card({articulo}: {articulo: Articulo}) {
 
                     <PencilSquareIcon className="h-6 w-6 text-gray-500 cursor-pointer" />
                     <PlusIcon className="h-6 w-6 text-gray-500 cursor-pointer" />
+                    <TrashIcon className="h-6 w-6 text-gray-500 cursor-pointer"  onClick={() => setDeleteModal(true)}/>
                 </div>
             </div>
             {show &&
@@ -56,6 +60,18 @@ export default function Card({articulo}: {articulo: Articulo}) {
                 <p>lote optimo: {articulo.lote_optimo ? articulo.lote_optimo : "Sin Dato"}</p>
                 <p>Modelo: {articulo.modelo_inventario}</p>
             </div>
+            }
+            {
+                deleteModal &&
+                <div className="modal flex check-delete fixed w-screen h-screen bg-gray-900 bg-opacity-50 top-0 left-0 z-50 justify-center items-center " onClick={() => setDeleteModal(false)}>
+                    <div className="modal-content bg-white w-1/3 h-fit p-4 rounded-md flex flex-col justify-start gap-2 items-center">
+                        <p>¿Estás seguro que deseas eliminar el articulo?</p>
+                        <div className="flex gap-3 items-center justify-around">
+                            <button className=" w-full p-2 bg-lime-800 text-white" onClick={() => deleteArticle(articulo.id)}>Si</button>
+                            <button className="w-full p-2 bg-red-800 text-white" onClick={() => setDeleteModal(false)}>No</button>
+                        </div>
+                    </div>
+                </div>
             }
         </div>
     );
