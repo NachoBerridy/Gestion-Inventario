@@ -22,19 +22,20 @@ export default async function handler(
         }
 
         //TODO agregar modelo de inventario,stock de seg, y punto de pedido. agregar tambien en la tabla de articulo
-        let { nombre, stock, precio,modeloInventario}:{nombre:String, stock:Number,precio:Number,modeloInventario:string} = req.body;
-        if (!nombre || !stock || !precio) {
+        let { nombre, stock, precio,modeloInventario, tasaRotacion}:{nombre:String, stock:Number,precio:Number,modeloInventario:string, tasaRotacion:number} = req.body;
+        if (!nombre || !stock || !precio || !tasaRotacion) {
             const missingFields = [];
             !nombre && missingFields.push("nombre");
             !stock && missingFields.push("stock");
             !precio && missingFields.push("precio");
+            !tasaRotacion && missingFields.push("Tasa de Rotacion");
             return res.status(400).json({ message: `Missing fields: ${missingFields.join(", ")}` });
         }
         if (!modeloInventario) modeloInventario = MODELOINVENTARIO;
         //TODO AGREAGAR MODELO DE INVENTARIO
         const result = await db.run(
-            `INSERT INTO Articulo (nombre, stock,modelo_inventario) VALUES (?, ?, ?)`,
-            [nombre, stock]
+            `INSERT INTO Articulo (nombre, stock, modelo_inventario, costo_almacenamiento) VALUES (?, ?, ?)`,
+            [nombre, stock, modeloInventario, tasaRotacion]
         );
         const date = new Date();
         const result2 = await db.run(
