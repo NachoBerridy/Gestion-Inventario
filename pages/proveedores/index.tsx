@@ -63,6 +63,7 @@ export default function Proveedores() {
             defaultValue={query}
             placeholder="Buscar..."
             className="w-full border-black border"
+            autoFocus={true}
           />
           <button type="submit">
             <svg
