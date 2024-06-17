@@ -1,6 +1,8 @@
-export default function meanAbsolutePercentageError(
-  actual: number,
-  predicted: number
-): number {
-  return (Math.abs(actual - predicted) / actual) * 100;
+export default function meanAbsolutePercentageError( predictions: number[], actuals: number[] ): number {
+  const n = predictions.length;
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    sum += 100*Math.abs((predictions[i] - actuals[i]))/actuals[i];
+  }
+  return sum / n;
 }
