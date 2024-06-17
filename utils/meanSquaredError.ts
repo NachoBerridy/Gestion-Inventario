@@ -1,4 +1,8 @@
 export default function meanSquaredError( actual: number[], predicted: number[]): number {
-    const sum = actual.reduce((acc, curr, index) => acc + Math.pow(curr - predicted[index], 2), 0);
-    return sum / actual.length;
+    const n = actual.length;
+    let sum = 0;
+    for (let i = 0; i < n; i++) {
+        sum += Math.pow(predicted[i] - actual[i], 2);
+    }
+    return sum / n;
 }
