@@ -1,15 +1,15 @@
 -- Insertar datos en la tabla Artículo
-INSERT INTO Articulo (nombre, stock, stock_seguridad, punto_pedido, modelo_inventario) VALUES
-('Articulo A', 15, 10, 20, 'LOTE FIJO'),
-('Articulo B', 15, 20, 40, 'LOTE FIJO'),
-('Articulo C', 300, 30, 60, 'INTERVALO FIJO'),
-('Articulo D', 400, 40, 80, 'INTERVALO FIJO'),
-('Articulo E', 50, 50, 100, 'LOTE FIJO'),
-('Articulo F', 600, 60, 120, 'LOTE FIJO'),
-('Articulo G', 700, 70, 140, 'INTERVALO FIJO'),
-('Articulo H', 800, 80, 160, 'LOTE FIJO'),
-('Articulo I', 900, 90, 180, 'LOTE FIJO'),
-('Articulo J', 1000, 100, 200, 'LOTE FIJO'); 
+INSERT INTO Articulo (nombre, stock, stock_seguridad, punto_pedido, modelo_inventario, tasa_rotacion) VALUES
+('Articulo A', 15, 10, 20, 'LOTE FIJO', 0.5),
+('Articulo B', 30, 20, 40, 'LOTE FIJO', 0.6),
+('Articulo C', 45, 30, 60, 'LOTE FIJO', 0.7),
+('Articulo D', 60, 40, 80, 'LOTE FIJO', 0.8),
+('Articulo E', 75, 50, 100, 'LOTE FIJO', 0.9),
+('Articulo F', 90, 60, 120, 'LOTE FIJO', 1.0),
+('Articulo G', 105, 70, 140, 'LOTE FIJO', 1.1),
+('Articulo H', 120, 80, 160, 'LOTE FIJO', 1.2),
+('Articulo I', 135, 90, 180, 'LOTE FIJO', 1.3),
+('Articulo J', 150, 100, 200, 'LOTE FIJO', 1.4);
 
 --Insertar datos en la tabla Articulo_Precio_Venta
 INSERT INTO Articulo_Precio_Venta (articulo_id, precio, fecha_inicio, fecha_fin) VALUES
@@ -34,27 +34,28 @@ INSERT INTO Proveedor (nombre, correo, telefono, direccion) VALUES
 ('Proveedor 6', 'proveedor6@example.com', '1234567895', 'Direccion 6');
 
 -- Insertar datos en la tabla Articulo_Proveedor
-INSERT INTO Articulo_Proveedor (plazo_entrega, articulo_id, proveedor_id) VALUES
-(5, 1, 1),
-(10, 2, 2),
-(15, 3, 3),
-(20, 4, 4),
-(25, 5, 5),
-(30, 6, 6),
-(35, 7, 1),
-(40, 8, 2),
-(45, 9, 3),
-(50, 10, 4),
-(55, 1, 5),
-(60, 2, 6),
-(65, 3, 1),
-(70, 4, 2),
-(75, 5, 3),
-(80, 6, 4),
-(85, 7, 5),
-(90, 8, 6),
-(95, 9, 1),
-(100, 10, 2);
+INSERT INTO Articulo_Proveedor (plazo_entrega, articulo_id, proveedor_id, costo_pedido) VALUES
+(1, 1, 1, 10),
+(2, 2, 2, 20),
+(3, 3, 3, 30),
+(4, 4, 4, 40),
+(5, 5, 5, 50),
+(6, 6, 6, 60),
+(1, 7, 1, 70),
+(2, 8, 2, 80),
+(3, 9, 3, 90),
+(4, 10, 4, 100),
+(5, 1, 5, 110),
+(6, 2, 6, 120),
+(1, 3, 1, 130),
+(2, 4, 2, 140),
+(3, 5, 3, 150),
+(4, 6, 4, 160),
+(5, 7, 5, 170),
+(6, 8, 6, 180),
+(1, 9, 1, 190),
+(2, 10, 2, 200);
+
 
 -- Insertar datos en la tabla Precio
 INSERT INTO Precio (articulo_proveedor_id, precio_unidad, cantidad_min, cantidad_max, fecha_inicio, fecha_fin) VALUES
