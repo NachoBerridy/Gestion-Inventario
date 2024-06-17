@@ -1,4 +1,4 @@
-import { FormEvent } from "react";
+import { FormEvent, useEffect, useRef } from "react";
 
 export default function CreateProveedor({
   open,
@@ -7,6 +7,16 @@ export default function CreateProveedor({
   open: boolean;
   close: () => void;
 }) {
+  const dialog = useRef(null);
+
+  useEffect(() => {
+    if (open) {
+      dialog?.current?.showModal();
+    } else {
+      dialog?.current?.close();
+    }
+  }, [open]);
+
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
@@ -26,12 +36,12 @@ export default function CreateProveedor({
 
   return (
     <dialog
+      ref={dialog}
       className={
         open
-          ? "p-10 w-96 flex gap-3 flex-col border-black border backdrop:bg-black/50 backdrop:backdrop-blur-md"
+          ? "p-10 w-96 flex gap-3 flex-col border-black border backdrop:backdrop-blur-sm"
           : undefined
       }
-      open={open}
     >
       <h1 className="text-lg">Nuevo Proveedor</h1>
 
@@ -72,7 +82,11 @@ export default function CreateProveedor({
         <button type="submit" className="rounded border-black border">
           Guardar
         </button>
-        <button onClick={() => close()} className="rounded border-black border">
+        <button
+          type="button"
+          onClick={() => close()}
+          className="rounded border-black border"
+        >
           Cancelar
         </button>
       </form>
