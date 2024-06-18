@@ -1,9 +1,12 @@
+import { IProveedor } from "@/pages/api/proveedores";
 import { FormEvent, useEffect, useRef } from "react";
 
-export default function CreateProveedor({
+export default function CreateUpdateProveedor({
+  currentProveedor,
   open,
   close,
 }: {
+  currentProveedor: IProveedor | null;
   open: boolean;
   close: () => void;
 }) {
@@ -25,13 +28,33 @@ export default function CreateProveedor({
 
     const formData = new FormData(form);
 
-    fetch("/api/proveedores", {
-      method: form.method,
-      body: new URLSearchParams(formData as any).toString(),
-      headers: {
-        "Content-Type": form.enctype,
-      },
-    }).then(() => close());
+    if (currentProveedor === null) {
+      fetch("/api/proveedores", {
+        method: form.method,
+        body: new URLSearchParams(formData as any).toString(),
+        headers: {
+          "Content-Type": form.enctype,
+        },
+      }).then(() => close());
+    } else {
+      fetch(`/api/proveedores/${currentProveedor.id}`, {
+        method: "PUT",
+        body: new URLSearchParams(formData as any).toString(),
+        headers: {
+          "Content-Type": form.enctype,
+        },
+      }).then(() => {
+        // close();
+      });
+    }
+  }
+
+  function fillValue(key: keyof IProveedor) {
+    if (currentProveedor === null) {
+      return "";
+    }
+
+    return currentProveedor[key];
   }
 
   return (
@@ -43,7 +66,9 @@ export default function CreateProveedor({
           : undefined
       }
     >
-      <h1 className="text-lg">Nuevo Proveedor</h1>
+      <h1 className="text-lg">
+        {currentProveedor === null ? "Nuevo Proveedor" : "Editar Proveedor"}
+      </h1>
 
       <form
         method="post"
@@ -56,6 +81,7 @@ export default function CreateProveedor({
           required
           placeholder="Nombre"
           minLength={3}
+          defaultValue={fillValue("nombre")}
           className="w-full p-1 border-black border"
         />
         <input
@@ -63,6 +89,7 @@ export default function CreateProveedor({
           required
           placeholder="Dirección"
           minLength={3}
+          defaultValue={fillValue("direccion")}
           className="w-full p-1 border-black border"
         />
         <input
@@ -70,12 +97,14 @@ export default function CreateProveedor({
           required
           placeholder="Correo"
           type="email"
+          defaultValue={fillValue("correo")}
           className="w-full p-1 border-black border"
         />
         <input
           name="telefono"
           placeholder="Telefono"
           type="tel"
+          defaultValue={fillValue("telefono")}
           className="w-full p-1 border-black border"
         />
 

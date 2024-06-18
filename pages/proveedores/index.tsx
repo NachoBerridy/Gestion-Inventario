@@ -1,4 +1,4 @@
-import CreateProveedor from "@/components/CreateProveedor";
+import CreateUpdateProveedor from "@/components/CreateUpdateProveedor";
 import Proveedor from "@/components/Proveedor";
 import { FormEvent, useState } from "react";
 import useSWR from "swr";
@@ -10,7 +10,13 @@ const PAGE_SIZE = 5;
 export default function Proveedores() {
   const [page, setPage] = useState<number>(1);
   const [query, setQuery] = useState<string>("");
-  const [openCreateNew, setOpenCreateNew] = useState(false);
+  const [dialogData, setDialogData] = useState<{
+    open: boolean;
+    currentProveedor: IProveedor | null;
+  }>({
+    open: false,
+    currentProveedor: null,
+  });
 
   const { data, error, isLoading } = useSWR<{
     rows: IProveedor[];
@@ -47,6 +53,26 @@ export default function Proveedores() {
     if (queryValue !== null) {
       setQuery(queryValue.toString());
     }
+  }
+
+  function openDialogCreate() {
+    setDialogData({
+      open: true,
+      currentProveedor: null,
+    });
+  }
+
+  function openDialogUpdate(proveedor: IProveedor) {
+    setDialogData({
+      open: true,
+      currentProveedor: proveedor,
+    });
+  }
+  function closeDialog() {
+    setDialogData({
+      open: false,
+      currentProveedor: null,
+    });
   }
 
   return (
@@ -86,15 +112,20 @@ export default function Proveedores() {
       </div>
       <div className="flex flex-col gap-10 overflow-auto">
         {data?.rows.map((p) => (
-          <Proveedor key={p.id} proveedor={p} />
+          <Proveedor
+            key={p.id}
+            proveedor={p}
+            editAction={() => openDialogUpdate(p)}
+          />
         ))}
       </div>
-      <CreateProveedor
-        open={openCreateNew}
-        close={() => setOpenCreateNew(false)}
+      <CreateUpdateProveedor
+        open={dialogData.open}
+        currentProveedor={dialogData.currentProveedor}
+        close={closeDialog}
       />
       <div className="w-full flex justify-end gap-3 mt-auto pr-10">
-        <button onClick={() => setOpenCreateNew(true)}>
+        <button onClick={openDialogCreate}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

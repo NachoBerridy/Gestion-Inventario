@@ -47,6 +47,7 @@ async function queryProveedores(
         when ?3 is not null and length(?3) > 0 then concat('%',?3,'%')
         else '%'
       end
+    order by nombre asc
     limit ?1 
     offset ?2
     `,
@@ -85,15 +86,15 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   res.status(200).json(proveedores);
 }
 
-const newProveedorSchema = z.object({
-  nombre: z.string(),
-  correo: z.string(),
+export const proveedrSchema = z.object({
+  nombre: z.string().min(3),
+  correo: z.string().email(),
   telefono: z.string().optional(),
-  direccion: z.string(),
+  direccion: z.string().min(3),
 }) satisfies z.ZodType<Omit<IProveedor, "id">>;
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
-  const proveedor = newProveedorSchema.safeParse(req.body);
+  const proveedor = proveedrSchema.safeParse(req.body);
 
   if (!proveedor.success) {
     res.status(422).json(proveedor.error);
