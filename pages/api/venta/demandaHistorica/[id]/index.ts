@@ -11,9 +11,11 @@ interface salesData {
     date: string;
 }
 
-interface SeparetedSales {
+export interface SeparetedSales {
     salesInPeriod: salesData[];
     quantity: number;
+    periodStart?: DateTime;
+    periodEnd?: DateTime;
 }
 
 export default async function handler(
@@ -94,9 +96,9 @@ const separeteByDays = (start_date: string, end_date: string, quantity: number, 
             return date >= periodStart && date <= periodEnd;
         });
         const quantity = salesInPeriod.reduce((acc, sale) => acc + sale.quantity, 0);
-        separetedSales.push({salesInPeriod, quantity});
+        separetedSales.push({salesInPeriod, quantity, periodStart, periodEnd});
     }
-    return separetedSales;
+    return separetedSales; // formato de respuesta [{salesInPeriod: salesData[], quantity: number, periodStart: DateTime, periodEnd: DateTime}]
 };
 const separeteByWeeks = (start_date: string, end_date: string, quantity: number,sales:salesData[]) => {
     const start = DateTime.fromISO(start_date);
@@ -111,7 +113,7 @@ const separeteByWeeks = (start_date: string, end_date: string, quantity: number,
             return date >= periodStart && date <= periodEnd;
         });
         const quantity = salesInPeriod.reduce((acc, sale) => acc + sale.quantity, 0);
-        separetedSales.push({salesInPeriod, quantity});
+        separetedSales.push({salesInPeriod, quantity, periodStart, periodEnd});
     }
     return separetedSales;
 };
@@ -128,7 +130,7 @@ const separeteByMonths = (start_date: string, end_date: string, quantity: number
             return date >= periodStart && date <= periodEnd;
         });
         const quantity = salesInPeriod.reduce((acc, sale) => acc + sale.quantity, 0);
-        separetedSales.push({salesInPeriod, quantity});
+        separetedSales.push({salesInPeriod, quantity, periodStart, periodEnd});
     }
     return separetedSales;
 };
@@ -145,7 +147,7 @@ const separeteByYears = (start_date: string, end_date: string, quantity: number,
             return date >= periodStart && date <= periodEnd;
         });
         const quantity = salesInPeriod.reduce((acc, sale) => acc + sale.quantity, 0);
-        separetedSales.push({salesInPeriod, quantity});
+        separetedSales.push({salesInPeriod, quantity, periodStart, periodEnd});
     }
     return separetedSales;
 };
