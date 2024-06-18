@@ -2,7 +2,7 @@ import { IProveedor } from "@/pages/api/proveedores";
 
 export default function Proveedor({ proveedor }: { proveedor: IProveedor }) {
   return (
-    <div className="flex gap-3 border border-black p-3 border-wid">
+    <div className="flex gap-3 border border-black p-3 border-wid bg-white">
       <span className="grow">{proveedor.nombre}</span>
       <span className="w-10 cursor-pointer">
         <svg

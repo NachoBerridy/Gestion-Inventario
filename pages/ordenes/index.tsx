@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { IOrdenCompra } from "@/pages/api/ordenes";
 import React from "react";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 export default function Orden(){
 
@@ -49,8 +48,7 @@ export default function Orden(){
 
 
   return (
-    <div className="w-screen h-screen bg-gray-600 flex justify-center items-center text-blackcon">
-      <ArrowLeftIcon className="h-8 w-8 cursor-pointer absolute top-4 left-4" onClick={() => window.history.back()} />
+    <div className="w-screen h-screen flex justify-center items-center text-blackcon">
       <table className="w-3/4 bg-white text-black p-4 m-4 rounded-lg shadow-lg">
         <thead>
           <tr className="bg-gray-200 text-gray-800 text-lg font-semibold uppercase" >
