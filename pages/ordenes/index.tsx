@@ -97,6 +97,7 @@ export default function OrdenesDeCompra() {
       tempOrders = tempOrders.filter(order => order.proveedor.toLowerCase().includes(searchProvider.toLowerCase()));
     }
     setFilteredOrders(tempOrders);
+    setDisplayOrders(tempOrders.slice((page - 1) * amount, page * amount));
     setPage(1); // Reset to the first page on new filter
   }
 
@@ -106,8 +107,9 @@ export default function OrdenesDeCompra() {
     fetchOrdenes();
   }, []);
 
-
-
+  useEffect(() => {
+    handleFilter();
+  }, [searchArticle, searchProvider, orders]);
 
 
   return (
