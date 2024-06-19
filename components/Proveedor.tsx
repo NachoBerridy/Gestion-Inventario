@@ -8,7 +8,7 @@ export default function Proveedor({
   editAction: () => void;
 }) {
   return (
-    <div className="flex gap-3 border border-black p-3 border-wid">
+    <div className="flex gap-3 border border-black p-3 border-wid bg-white">
       <span className="grow">{proveedor.nombre}</span>
       <span className="w-10 cursor-pointer">
         <svg

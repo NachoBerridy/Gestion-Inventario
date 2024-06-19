@@ -1,22 +1,18 @@
 import CardOrdenDeCompra from "@/components/OrdenesDeCompra/CardOrdenDeCompra";
 import EditarOrdenDeCompra from "@/components/OrdenesDeCompra/EditarOrdenDeCompra";
-import { useState, useEffect } from "react";
-import axios from "axios";
 import { IOrdenCompra } from "@/pages/api/ordenes";
-import React from "react";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
-export default function Orden(){
-
-
+export default function Orden() {
   const [orders, setOrders] = useState<IOrdenCompra[]>([]);
   const [orderId, setOrderId] = useState<number>(0);
   const [showEdit, setShowEdit] = useState<boolean>(false);
-  
+
   const selectOrder = (id: number) => {
     setOrderId(id);
     setShowEdit(true);
-  }
+  };
 
   const fetchOrdenes = async () => {
     try {
@@ -26,7 +22,7 @@ export default function Orden(){
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   const deleteOrder = async (id: number) => {
     try {
@@ -35,25 +31,17 @@ export default function Orden(){
     } catch (error) {
       console.error(error);
     }
-  }
-
-
+  };
 
   useEffect(() => {
-
     fetchOrdenes();
   }, []);
 
-
-
-
-
   return (
-    <div className="w-screen h-screen bg-gray-600 flex justify-center items-center text-blackcon">
-      <ArrowLeftIcon className="h-8 w-8 cursor-pointer absolute top-4 left-4" onClick={() => window.history.back()} />
+    <div className="w-screen h-screen flex justify-center items-center text-blackcon">
       <table className="w-3/4 bg-white text-black p-4 m-4 rounded-lg shadow-lg">
         <thead>
-          <tr className="bg-gray-200 text-gray-800 text-lg font-semibold uppercase" >
+          <tr className="bg-gray-200 text-gray-800 text-lg font-semibold uppercase">
             <th className="text-center p-2">ID</th>
             <th className="text-center p-2">Artículo</th>
             <th className="text-center p-2">Proveedor</th>
@@ -66,18 +54,22 @@ export default function Orden(){
         </thead>
         <tbody>
           {orders.map((orden) => (
-            <CardOrdenDeCompra 
-              key={orden.id} 
-              orden={orden} 
+            <CardOrdenDeCompra
+              key={orden.id}
+              orden={orden}
               selectOrder={selectOrder}
               deleteOrder={deleteOrder}
             />
           ))}
         </tbody>
       </table>
-      {
-        (orderId!==0) && <EditarOrdenDeCompra orderId={orderId} show={showEdit} setShow={setShowEdit} />
-      }
+      {orderId !== 0 && (
+        <EditarOrdenDeCompra
+          orderId={orderId}
+          show={showEdit}
+          setShow={setShowEdit}
+        />
+      )}
     </div>
-  )
+  );
 }
