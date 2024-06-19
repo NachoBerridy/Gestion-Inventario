@@ -47,8 +47,10 @@ export default function OrdenesDeCompra() {
   const deleteOrder = async (id: number) => {
     try {
       const response = await axios.delete(`/api/ordenes/${id}`);
+      toast.success("Orden de compra eliminada exitosamente");
       fetchOrdenes();
     } catch (error) {
+      toast.error("Error al eliminar la orden de compra");
       console.error(error);
     }
   }
