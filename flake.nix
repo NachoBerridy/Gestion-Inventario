@@ -35,6 +35,7 @@
                   esbenp.prettier-vscode
                   humao.rest-client
                   bradlc.vscode-tailwindcss
+                  eamodio.gitlens
                 ];
               in
               (vscode-with-extensions.override {

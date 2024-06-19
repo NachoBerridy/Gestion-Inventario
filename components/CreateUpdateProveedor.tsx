@@ -70,55 +70,57 @@ export default function CreateUpdateProveedor({
         {currentProveedor === null ? "Nuevo Proveedor" : "Editar Proveedor"}
       </h1>
 
-      <form
-        method="post"
-        encType="application/x-www-form-urlencoded"
-        className="flex gap-3 flex-col"
-        onSubmit={handleSubmit}
-      >
-        <input
-          name="nombre"
-          required
-          placeholder="Nombre"
-          minLength={3}
-          defaultValue={fillValue("nombre")}
-          className="w-full p-1 border-black border"
-        />
-        <input
-          name="direccion"
-          required
-          placeholder="Dirección"
-          minLength={3}
-          defaultValue={fillValue("direccion")}
-          className="w-full p-1 border-black border"
-        />
-        <input
-          name="correo"
-          required
-          placeholder="Correo"
-          type="email"
-          defaultValue={fillValue("correo")}
-          className="w-full p-1 border-black border"
-        />
-        <input
-          name="telefono"
-          placeholder="Telefono"
-          type="tel"
-          defaultValue={fillValue("telefono")}
-          className="w-full p-1 border-black border"
-        />
-
-        <button type="submit" className="rounded border-black border">
-          Guardar
-        </button>
-        <button
-          type="button"
-          onClick={() => close()}
-          className="rounded border-black border"
+      {open && (
+        <form
+          method="post"
+          encType="application/x-www-form-urlencoded"
+          className="flex gap-3 flex-col"
+          onSubmit={handleSubmit}
         >
-          Cancelar
-        </button>
-      </form>
+          <input
+            name="nombre"
+            required
+            placeholder="Nombre"
+            minLength={3}
+            defaultValue={fillValue("nombre")}
+            className="w-full p-1 border-black border"
+          />
+          <input
+            name="direccion"
+            required
+            placeholder="Dirección"
+            minLength={3}
+            defaultValue={fillValue("direccion")}
+            className="w-full p-1 border-black border"
+          />
+          <input
+            name="correo"
+            required
+            placeholder="Correo"
+            type="email"
+            defaultValue={fillValue("correo")}
+            className="w-full p-1 border-black border"
+          />
+          <input
+            name="telefono"
+            placeholder="Telefono"
+            type="tel"
+            defaultValue={fillValue("telefono")}
+            className="w-full p-1 border-black border"
+          />
+
+          <button type="submit" className="rounded border-black border">
+            Guardar
+          </button>
+          <button
+            type="button"
+            onClick={() => close()}
+            className="rounded border-black border"
+          >
+            Cancelar
+          </button>
+        </form>
+      )}
     </dialog>
   );
 }
