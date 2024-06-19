@@ -4,6 +4,9 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
+const PENDIENTE = 'Pendiente'
+const ENVIADAS = 'Enviada'
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>,
