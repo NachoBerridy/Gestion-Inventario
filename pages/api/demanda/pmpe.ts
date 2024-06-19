@@ -86,6 +86,11 @@ const demandaHistorica : SeparetedSales[] = [
 
 
 ]
+interface predictionDemand {
+    prediction: number[];
+    nexPeriod: number;
+    error: number;
+}
                 
 
 export default async function handler(
@@ -104,12 +109,12 @@ export default async function handler(
         allowedError = 0.1,
        } = req.body;
 
-        const prediction = historicalDemand.map((period:SeparetedSales, index:number) => {
+        let prediction = historicalDemand.map((period:SeparetedSales, index:number) => {
             const prediction = initialValue + alfa * (period.quantity - initialValue);
 
             //TODO: Implementar el calculo del error
             initialValue = prediction;
-            return Math.round(prediction); 
+            return Math.round(prediction)
         })
         let error = null
         const real = historicalDemand.map((period:SeparetedSales) => period.quantity).slice(1) // Eliminamos el primer periodo ya que no se puede calcular el error
@@ -125,6 +130,18 @@ export default async function handler(
             error = meanAbsolutePercentageError(predictions, real)
         }
         const nexPeriod = prediction[prediction.length -1]
+        prediction.pop()
+        
+        //agrego el periodo a las predicciones
+        for (let i = 0; i < prediction.length; i++) {
+            prediction[i] = {
+                prediction: prediction[i],
+                periodStart: historicalDemand[i+1].periodStart,
+                periodEnd: historicalDemand[i+1].periodEnd
+            }
+            
+        }
+
         return res.status(200).json({prediction, nexPeriod, error})
     }
     catch (error: any) {
