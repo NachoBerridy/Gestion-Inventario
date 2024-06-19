@@ -8,7 +8,7 @@ export default function CreateUpdateProveedor({
 }: {
   currentProveedor: IProveedor | null;
   open: boolean;
-  close: () => void;
+  close: (refresh: boolean) => void;
 }) {
   const dialog = useRef(null);
 
@@ -23,8 +23,6 @@ export default function CreateUpdateProveedor({
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
-    console.log(form);
-    console.log(form.enctype);
 
     const formData = new FormData(form);
 
@@ -35,7 +33,7 @@ export default function CreateUpdateProveedor({
         headers: {
           "Content-Type": form.enctype,
         },
-      }).then(() => close());
+      }).then(() => close(false));
     } else {
       fetch(`/api/proveedores/${currentProveedor.id}`, {
         method: "PUT",
@@ -44,7 +42,7 @@ export default function CreateUpdateProveedor({
           "Content-Type": form.enctype,
         },
       }).then(() => {
-        // close();
+        close(true);
       });
     }
   }

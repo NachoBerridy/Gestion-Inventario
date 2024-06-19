@@ -15,8 +15,6 @@ export default async function handler(
 
   const { id } = req.query;
 
-  console.log({ id });
-
   const parsedId = idSchema.safeParse(parseInt(id));
 
   if (!parsedId.success) {
@@ -61,6 +59,7 @@ export default async function handler(
       ":correo": proveedor.data.correo,
       ":telefono": proveedor.data.telefono,
       ":direccion": proveedor.data.direccion,
+      ":id": parsedId.data,
     }
   );
 
