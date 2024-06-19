@@ -1,13 +1,19 @@
 import { IOrdenCompra } from "@/pages/api/ordenes";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import formatPrice from "@/utils/formatPrice";
+interface EditPayload {
+  id: number, estado: string, fecha: string, cantidad: number, articuloProveedorId: number
+}
 
-export default function NuevaOrdenCompra({orderId, show, setShow}:{orderId:number, show:boolean, setShow: (show:boolean) => void}) {
+export default function CrearNuevaOrden({orderId, show, setShow, updateOrder}:{orderId:number, show:boolean, setShow: (show:boolean) => void, updateOrder: (payload: EditPayload) => void}) {
 
 
   const [order, setOrder] = useState<IOrdenCompra>({
     id: orderId,
     articulo: "",
+    articuloId: 0,
+    proveedorId: 0,
     proveedor: "",
     precio: 0,
     estado: "",
@@ -15,20 +21,13 @@ export default function NuevaOrdenCompra({orderId, show, setShow}:{orderId:numbe
     cantidad: 0,
     total: 0,
     plazo: "",
+    articuloProveedorId: 0
   });
 
-  //TODO Hacer un useEffect que traiga la orden de compra con el id que se recibe por props y complete informcación de article
-  //La Anto va a hacer una interface de artículo, importarla y usarla en el tipado de article
-  const [article, setArticle] = useState<{name:string} | null>({
-    name: "Artículo 1"
-  });
 
-  const [providers, setProviders] = useState<any[]>([]); //TODO Cambiar any por una interface de proveedores
+  const [providers, setProviders] = useState<any[]>([]);
+  const [selectedProvider, setSelectedProvider] = useState<any>({});
   
-  /* TODO Implementar función que traiga la lista de proveedores para este artícul
-    Esta función debe traer la lista de proveedores para el artículo seleccionado, 
-    el precio unitario y la cantidad máxima y mínima que se puede solicitar en cada proveedor
-  */
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -36,17 +35,51 @@ export default function NuevaOrdenCompra({orderId, show, setShow}:{orderId:numbe
       ...prevOrder,
       [name]: value,
     }));
+    if (name == "cantidad") {
+      setOrder((prevOrder) => ({
+        ...prevOrder,
+        total: Number(value) * order.precio
+      }));
+    }
   };
 
+  const handleSelectProvider = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = e.target;
+    setSelectedProvider(providers.find((provider) => provider.id === Number(value)));
+    setOrder((prevOrder) => ({
+      ...prevOrder,
+      proveedorId: Number(value),
+      articuloProveedorId: Number(value)
+    }));
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    updateOrder({
+      id: orderId,
+      estado: order.estado,
+      fecha: order.fecha,
+      cantidad: order.cantidad,
+      articuloProveedorId: order.articuloProveedorId
+    });
+  }
+
   useEffect(() => {
+    const getProviders = async (id: number) => {
+      const response = await axios.post("/api/proveedores/listByArticle", {id});
+      setProviders(response.data);
+      setSelectedProvider(response.data.find((provider: { id: number }) => provider.id === order.articuloProveedorId));
+    }
+
     const getOrder = async () => {
       const response = await axios.get(`/api/ordenes/${orderId}`);
       setOrder(response.data);
-      console.log(response.data);
-      console.log("order", order);
+      getProviders(response.data.articuloId);
     }
     getOrder();
   }, [orderId]);
+
+
 
   return (
     <div className="fixed inset-0 items-center justify-center z-50" style={{display: show ? "flex" : "none"}}>
@@ -56,7 +89,7 @@ export default function NuevaOrdenCompra({orderId, show, setShow}:{orderId:numbe
       </div>
       <div className="relative z-20 w-1/2 min-h-fit h-1/2 bg-gray-200 p-5 rounded-lg shadow-lg flex flex-col justify-start items-center">
         <h2 className="text-xl font-bold mb-4">Orden de Compra de { order.articulo }</h2>
-        <form className="w-full">
+        <form className="w-full" onSubmit={handleSubmit}>
           <div className="flex w-full gap-2">
             <div className="flex flex-col w-1/2">
               <div className="flex flex-col w-full mb-4">
@@ -65,13 +98,13 @@ export default function NuevaOrdenCompra({orderId, show, setShow}:{orderId:numbe
                   name="proveedor"
                   id="proveedor"
                   className="p-2 rounded-md w-full"
-                  value={order.proveedor}
-                  onChange={handleChange}
+                  value={selectedProvider?.id ? selectedProvider.id : ""}
+                  onChange={handleSelectProvider}
                 >
                   <option value="">Seleccionar Proveedor</option>
                   {
                     providers.map((provider) => (
-                      <option key={provider.id} value={provider.id}>{provider.name}</option>
+                      <option key={provider.id} value={provider.id}>{provider.proveedor}</option>
                     ))
                   }
                 </select>
@@ -88,7 +121,7 @@ export default function NuevaOrdenCompra({orderId, show, setShow}:{orderId:numbe
                 />
               </div>
               <div className="flex flex-col w-full mb-4">
-                <label htmlFor="fecha" className="mb-2">Fecha de Recepción</label>
+                <label htmlFor="fecha" className="mb-2">Fecha</label>
                 <input
                   type="date"
                   name="fecha"
@@ -136,25 +169,11 @@ export default function NuevaOrdenCompra({orderId, show, setShow}:{orderId:numbe
               </div>
               <div className="flex flex-col w-full mb-4">
                 <label htmlFor="total" className="mb-2">Total</label>
-                <input
-                  type="number"
-                  name="total"
-                  id="total"
-                  className="p-2 rounded-md w-full"
-                  value={order.total}
-                  onChange={handleChange}
-                />
+                <span className="p-2 rounded-md w-full bg-contrast text-white">{formatPrice(order.total)}</span>
               </div>
               <div className="flex flex-col w-full mb-4">
                 <label htmlFor="plazo" className="mb-2">Plazo de Entrega</label>
-                <input
-                  type="number"
-                  name="plazo"
-                  id="plazo"
-                  className="p-2 rounded-md w-full"
-                  value={order.plazo}
-                  onChange={handleChange}
-                />
+                <span className="p-2 rounded-md w-full ">{order.plazo} días</span>
               </div>
             </div>
           </div>

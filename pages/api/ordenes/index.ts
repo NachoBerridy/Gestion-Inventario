@@ -7,6 +7,9 @@ let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 export interface IOrdenCompra {
   id: number;
   articulo: string;
+  articuloId: number;
+  proveedorId: number;
+  articuloProveedorId: number;
   proveedor: string;
   precio: number;
   estado: string;
@@ -14,6 +17,12 @@ export interface IOrdenCompra {
   cantidad: number;
   total: number;
   plazo: string;
+}
+
+export interface newOrder { 
+  articuloProveedorId : number,
+  cantidad : number,
+  fechaOrden : string
 }
 
 export interface IEstadoOrdenCompra {
@@ -32,7 +41,6 @@ export default async function handler(
       filename: "./db/test.db",
       driver: sqlite3.Database,
     });
-    console.log("db", db);
     const ordenes = await db.all(`
       SELECT 
         Orden_Compra.id as id,
