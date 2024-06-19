@@ -11,9 +11,11 @@ interface salesData {
     date: string;
 }
 
-interface SeparetedSales {
+export interface SeparetedSales {
     salesInPeriod: salesData[];
     quantity: number;
+    periodStart?: DateTime;
+    periodEnd?: DateTime;
 }
 
 export default async function handler(
@@ -27,16 +29,18 @@ export default async function handler(
                 driver: sqlite3.Database,
             });
         }
-        if (req.method !== "GET") {
+        if (req.method !== "POST") {
             return res.status(405).json({ message: "Method Not Allowed" });
         }
         // const { id, start_date, end_date, period }: query = req.query;
         
         const id = req.query.id;
-        const url = new URL(req.url || '', `http://${req.headers.host}`);
-        const start_date = url.searchParams.get('start_date');
-        const end_date = url.searchParams.get('end_date');
-        const period = url.searchParams.get('period'); // formato 1-d, 2-w, 3-m, 4-y, donde 1 es la cantidad por periodo y d es el tipo de periodo (d-dia, w-semana, m-mes, y-año)
+        // const url = new URL(req.url || '', `http://${req.headers.host}`);
+        // const start_date = url.searchParams.get('start_date');
+        // const end_date = url.searchParams.get('end_date');
+        // const period = url.searchParams.get('period'); // formato 1-d, 2-w, 3-m, 4-y, donde 1 es la cantidad por periodo y d es el tipo de periodo (d-dia, w-semana, m-mes, y-año)
+
+        const { start_date, end_date, period } = req.body;
 
         if (!id || !start_date || !end_date|| !period) {
             return res.status(400).json({ message: "Missing fields" });
@@ -54,7 +58,6 @@ export default async function handler(
                 and Venta.fecha <= ?
             order by Venta.fecha asc
             `,[id, start_date, end_date]);
-
         let separetedSales:SeparetedSales[];
         switch (typePeriod) {
             case 'd':
@@ -81,71 +84,78 @@ export default async function handler(
     }
 }
 
-const separeteByDays = (start_date: string, end_date: string, quantity: number, sales:salesData[]) => {
+const separeteByDays = (start_date: string, end_date: string, quantityNumber: number, sales:salesData[]) => {
     const start = DateTime.fromISO(start_date);
     const end = DateTime.fromISO(end_date);
-    const quantityOfPeriod = end.diff(start, 'days').days / quantity;
+    const quantityOfPeriod = Math.round(end.diff(start, 'days').days / quantityNumber);
     let separetedSales:SeparetedSales[] = [];
-    for (let i = 0; i < quantity; i++) {
-        const periodStart = start.plus({ days: i * quantityOfPeriod });
-        const periodEnd = periodStart.plus({ days: quantityOfPeriod });
+    let periodStart = start;
+    for (let i = 0; i < quantityOfPeriod; i++) {
+        const periodEnd = periodStart.plus({ days: quantityNumber-1 }).endOf('day');
         const salesInPeriod = sales.filter(sale => {
             const date = DateTime.fromISO(sale.date);
             return date >= periodStart && date <= periodEnd;
         });
         const quantity = salesInPeriod.reduce((acc, sale) => acc + sale.quantity, 0);
-        separetedSales.push({salesInPeriod, quantity});
+        separetedSales.push({salesInPeriod, quantity, periodStart, periodEnd});
+        periodStart = periodStart.plus({ days: i }).startOf('day');
+    }
+    return separetedSales; // formato de respuesta [{salesInPeriod: salesData[], quantity: number, periodStart: DateTime, periodEnd: DateTime}]
+};
+
+const separeteByWeeks = (start_date: string, end_date: string, quantityNumber: number,sales:salesData[]) => {
+    const start = DateTime.fromISO(start_date);
+    const end = DateTime.fromISO(end_date);
+    const quantityOfPeriod = Math.round(end.diff(start, 'weeks').weeks / quantityNumber);
+    let separetedSales:SeparetedSales[] = [];
+    let periodStart = start;
+    for (let i = 0; i < quantityOfPeriod; i++) {
+        const periodEnd = periodStart.plus({ weeks: quantityNumber-1 }).endOf('week');
+        const salesInPeriod = sales.filter(sale => {
+            const date = DateTime.fromISO(sale.date);
+            return date >= periodStart && date <= periodEnd;
+        });
+        const quantity = salesInPeriod.reduce((acc, sale) => acc + sale.quantity, 0);
+        separetedSales.push({salesInPeriod, quantity, periodStart, periodEnd});
+        periodStart = periodStart.plus({ weeks: quantityNumber }).startOf('week');
     }
     return separetedSales;
 };
-const separeteByWeeks = (start_date: string, end_date: string, quantity: number,sales:salesData[]) => {
+
+const separeteByMonths = (start_date: string, end_date: string, quantityNumber: number,sales:salesData[]) => {
     const start = DateTime.fromISO(start_date);
     const end = DateTime.fromISO(end_date);
-    const quantityOfPeriod = end.diff(start, 'weeks').weeks / quantity;
+    const quantityOfPeriod = Math.round(end.diff(start, 'months').months / quantityNumber);
     let separetedSales:SeparetedSales[] = [];
-    for (let i = 0; i < quantity; i++) {
-        const periodStart = start.plus({ weeks: i * quantityOfPeriod });
-        const periodEnd = periodStart.plus({ weeks: quantityOfPeriod });
+    let periodStart = start;
+    for (let i = 0; i < quantityOfPeriod; i++) {
+        const periodEnd = periodStart.plus({ months: quantityNumber-1}).endOf('month');
+        console.log(periodStart.toISO(), periodEnd.toISO());
         const salesInPeriod = sales.filter(sale => {
             const date = DateTime.fromISO(sale.date);
             return date >= periodStart && date <= periodEnd;
         });
         const quantity = salesInPeriod.reduce((acc, sale) => acc + sale.quantity, 0);
-        separetedSales.push({salesInPeriod, quantity});
+        separetedSales.push({salesInPeriod, quantity, periodStart, periodEnd});
+        periodStart = periodStart.plus({ months: quantityNumber}).startOf('month');
     }
     return separetedSales;
 };
-const separeteByMonths = (start_date: string, end_date: string, quantity: number,sales:salesData[]) => {
+const separeteByYears = (start_date: string, end_date: string, quantityNumber: number,sales:salesData[]) => {
     const start = DateTime.fromISO(start_date);
     const end = DateTime.fromISO(end_date);
-    const quantityOfPeriod = end.diff(start, 'months').months / quantity;
+    const quantityOfPeriod = Math.round(end.diff(start, 'years').years / quantityNumber);
     let separetedSales:SeparetedSales[] = [];
-    for (let i = 0; i < quantity; i++) {
-        const periodStart = start.plus({ months: i * quantityOfPeriod });
-        const periodEnd = periodStart.plus({ months: quantityOfPeriod });
+    let periodStart = start;
+    for (let i = 0; i < quantityOfPeriod; i++) {
+        const periodEnd = periodStart.plus({ years: quantityNumber-1 }).endOf('year');
         const salesInPeriod = sales.filter(sale => {
             const date = DateTime.fromISO(sale.date);
             return date >= periodStart && date <= periodEnd;
         });
         const quantity = salesInPeriod.reduce((acc, sale) => acc + sale.quantity, 0);
-        separetedSales.push({salesInPeriod, quantity});
-    }
-    return separetedSales;
-};
-const separeteByYears = (start_date: string, end_date: string, quantity: number,sales:salesData[]) => {
-    const start = DateTime.fromISO(start_date);
-    const end = DateTime.fromISO(end_date);
-    const quantityOfPeriod = end.diff(start, 'years').years / quantity;
-    let separetedSales:SeparetedSales[] = [];
-    for (let i = 0; i < quantity; i++) {
-        const periodStart = start.plus({ years: i * quantityOfPeriod });
-        const periodEnd = periodStart.plus({ years: quantityOfPeriod });
-        const salesInPeriod = sales.filter(sale => {
-            const date = DateTime.fromISO(sale.date);
-            return date >= periodStart && date <= periodEnd;
-        });
-        const quantity = salesInPeriod.reduce((acc, sale) => acc + sale.quantity, 0);
-        separetedSales.push({salesInPeriod, quantity});
+        separetedSales.push({salesInPeriod, quantity, periodStart, periodEnd});
+        periodStart = periodStart.plus({ years: quantityNumber }).startOf('year');
     }
     return separetedSales;
 };

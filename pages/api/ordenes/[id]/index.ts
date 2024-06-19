@@ -9,8 +9,10 @@ const getOrden = async (id: string, db: Database<sqlite3.Database, sqlite3.State
     return await db.get(
       `SELECT 
         Articulo.nombre as articulo,
+        Articulo.id as articuloId,
+        Proveedor.id as proveedorId,
         Proveedor.nombre as proveedor,
-        Articulo_Proveedor.id as articleProviderId,
+        Articulo_Proveedor.id as articuloProveedorId,
         cantidad as cantidad,
         Orden_Compra_Estado.fecha as fecha, 
         plazo_entrega as plazo,

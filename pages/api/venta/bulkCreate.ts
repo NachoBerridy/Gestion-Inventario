@@ -69,7 +69,7 @@ export default async function handler(
             const { articulo_id, cantidad, fecha }: { articulo_id: number, cantidad: number, fecha: string } = venta;
             const date = new Date(fecha);
             const result = await db.run(
-                `INSERT INTO Venta (articulo_id, cantidad,fecha) VALUES (?, ?)`,
+                `INSERT INTO Venta (articulo_id, cantidad,fecha) VALUES (?, ?, ?)`,
                 [articulo_id, cantidad, date.toISOString()]
             );
             ids.push(result.lastID);

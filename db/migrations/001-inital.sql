@@ -6,7 +6,12 @@
 create table if not exists Articulo (
     id integer primary key,
     nombre text,
-    stock integer
+    stock integer,
+    stock_seguridad integer,
+    punto_pedido integer,
+    lote_optimo integer,
+    tasa_rotacion float,
+    modelo_inventario text
 );
 
 --VENTA
@@ -54,6 +59,7 @@ create table if not exists Articulo_Proveedor (
     plazo_entrega integer,
     articulo_id integer,
     proveedor_id integer,
+    costo_pedido float,
     foreign key (articulo_id) references Articulo(id),
     foreign key (proveedor_id) references Proveedor(id)
 );

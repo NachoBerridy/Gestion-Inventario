@@ -15,26 +15,25 @@ export default async function handler(
                 driver: sqlite3.Database,
             });
         }
-        if (req.method !== "GET") {
+        if (req.method !== "POST") {
             return res.status(405).json({ message: "Method Not Allowed" });
         }
+
+        const { id } = req.body;
 
         //Get url query parameters
         const url = new URL(req.url || "", `http://${req.headers.host}`);
         const params = url.searchParams;
         
 
-        const articulos = await db.all(`
-            SELECT Articulo.id, nombre, stock, precio, stock_seguridad, punto_pedido, lote_optimo, modelo_inventario FROM Articulo
-            join Articulo_Precio_Venta on Articulo.id = Articulo_Precio_Venta.articulo_id
+        const proveedores = await db.all(`
+            SELECT Articulo_Proveedor.id, plazo_entrega as plazoEntrega, costo_pedido as costoPedido, nombre as proveedor, precio_unidad as precioUnitario FROM Articulo_Proveedor
+            join Proveedor on Proveedor.id = Articulo_Proveedor.proveedor_id
+            join Precio on articulo_proveedor_id = Articulo_Proveedor.id
             where 
-                Articulo_Precio_Venta.fecha_fin is NULL
-            `);
-        //If params is empty, return all articles with their data if not return only the article name and id
-        if (params.get("onlyName") === "true") {
-            return res.status(200).json(articulos.map(articulo => ({ id: articulo.id, nombre: articulo.nombre })));
-        }
-        return res.status(200).json(articulos);
+                Articulo_Proveedor.articulo_id = ?
+            `, [id]);
+        return res.status(200).json(proveedores);
     }
     catch (error: any) {
         return res.status(500).json({ message: error.message });

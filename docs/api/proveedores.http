@@ -1,0 +1,7 @@
+@base-url = http://localhost:3000/api
+
+
+###
+GET {{base-url}}/proveedores
+?pageSize=2
+&offset=5

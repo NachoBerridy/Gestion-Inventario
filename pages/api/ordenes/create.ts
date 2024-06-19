@@ -23,29 +23,17 @@ if (!db) {
     return res.status(405).end(`Method ${method} Not Allowed`);
   }
   try {
-    const { idProveedorArticulo, cantidad, fechaOrden}: { idProveedorArticulo: number, cantidad: number, fechaOrden: string } = req.body;
-    const articleId = await db.get(
-      "SELECT articulo_id FROM Articulo_Proveedor WHERE id = ?",
-      [idProveedorArticulo]
+    const { articuloProveedorId, cantidad, fechaOrden}: { articuloProveedorId: number, cantidad: number, fechaOrden: string } = req.body;
+    console.log(articuloProveedorId, cantidad, fechaOrden);
+    const p = await db.get(
+      "SELECT precio_unidad as precioUnitario FROM Precio WHERE articulo_proveedor_id = ? AND fecha_fin IS NULL",
+      [articuloProveedorId]
     );
-    const orders = await db.all(
-      `SELECT * FROM Articulo 
-      join Articulo_Proveedor on Articulo.id = Articulo_Proveedor.articulo_id
-      join Orden_Compra on Articulo_Proveedor.id = Orden_Compra.articulo_proveedor_id
-      join Orden_Compra_Estado on Orden_Compra.id = Orden_Compra_Estado.orden_compra_id
-      where Articulo.id = ? and Orden_Compra_Estado.estado in (?,?)`,
-      [articleId, PENDIENTE, ENVIADAS]
-      );
-    if (orders && orders.length > 0) {
-        return res.status(400).json({ message: `El articulo tiene ordenes en curso` });
-    }
-    const { precioUnitario } = await db.get(
-      "SELECT precio_unidad as precioUnitario FROM Precio WHERE articulo_proveedor_id = ? and fecha_fin = ?",
-      [idProveedorArticulo, null]
-    );
+    console.log(p);
+    const precioUnitario = p.precioUnitario;
     const result = await db.run(
       "INSERT INTO Orden_Compra (articulo_proveedor_id, cantidad, total) VALUES (?, ?, ?)",
-      [idProveedorArticulo, cantidad, precioUnitario*cantidad]
+      [articuloProveedorId, cantidad, precioUnitario*cantidad]
     );
     await db.run(
       "INSERT INTO Orden_Compra_Estado (orden_compra_id, estado, fecha) VALUES (?, ?, ?)",
