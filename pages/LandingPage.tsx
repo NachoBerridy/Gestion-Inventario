@@ -65,8 +65,8 @@ export default function LandingPage() {
           justifyItems: "center",
         }}
       >
-        {pages.map((page,i) => (
-          <Link 
+        {pages.map((page, i) => (
+          <Link
             key={i}
             href={page.path}
             style={{
