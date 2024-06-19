@@ -32,9 +32,14 @@ export default async function handler(
             return res.status(400).json({ message: `Missing fields: ${missingFields.join(", ")}` });
         }
         if (!modeloInventario) modeloInventario = MODELOINVENTARIO;
-        //TODO AGREAGAR MODELO DE INVENTARIO
+
+        const existing = await db.get(`SELECT * FROM Articulo WHERE nombre = ?`, [nombre]);
+        if (existing) {
+            return res.status(409).json({ message: "No puede crear un articulo con el mismo nombre que uno existente" });
+        }
+
         const result = await db.run(
-            `INSERT INTO Articulo (nombre, stock, modelo_inventario, costo_almacenamiento) VALUES (?, ?, ?)`,
+            `INSERT INTO Articulo (nombre, stock, modelo_inventario, tasa_rotacion) VALUES (?, ?, ?, ?)`,
             [nombre, stock, modeloInventario, tasaRotacion]
         );
         const date = new Date();

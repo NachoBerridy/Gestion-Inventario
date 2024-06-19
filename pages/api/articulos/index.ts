@@ -7,4 +7,5 @@ export interface Articulo {
     punto_pedido : number;
     modelo_inventario : string;
     lote_optimo : number;
+    tasa_rotacion : number;
 }
