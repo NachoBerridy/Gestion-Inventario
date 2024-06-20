@@ -1,5 +1,6 @@
-import CreateUpdateProveedor from "@/components/CreateUpdateProveedor";
-import Proveedor from "@/components/Proveedor";
+import AddArticuloProveedor from "@/components/Proveedor/AddArticuloProveedor";
+import CreateUpdateProveedor from "@/components/Proveedor/CreateUpdateProveedor";
+import Proveedor from "@/components/Proveedor/Proveedor";
 import { FormEvent, useState } from "react";
 import useSWR from "swr";
 import { IProveedor } from "../api/proveedores";
@@ -11,6 +12,14 @@ export default function Proveedores() {
   const [page, setPage] = useState<number>(1);
   const [query, setQuery] = useState<string>("");
   const [dialogData, setDialogData] = useState<{
+    open: boolean;
+    currentProveedor: IProveedor | null;
+  }>({
+    open: false,
+    currentProveedor: null,
+  });
+
+  const [dialogDataAddArticulo, setDialogDataAddArticulo] = useState<{
     open: boolean;
     currentProveedor: IProveedor | null;
   }>({
@@ -68,6 +77,7 @@ export default function Proveedores() {
       currentProveedor: proveedor,
     });
   }
+
   function closeDialog(refresh: boolean) {
     setDialogData({
       open: false,
@@ -76,6 +86,20 @@ export default function Proveedores() {
     if (refresh) {
       mutate();
     }
+  }
+
+  function addaArticulo(proveedor: IProveedor) {
+    setDialogDataAddArticulo({
+      currentProveedor: proveedor,
+      open: true,
+    });
+  }
+
+  function closeDialogAddArticulo() {
+    setDialogDataAddArticulo({
+      currentProveedor: null,
+      open: false,
+    });
   }
 
   return (
@@ -119,13 +143,21 @@ export default function Proveedores() {
             key={p.id}
             proveedor={p}
             editAction={() => openDialogUpdate(p)}
+            addAction={() => addaArticulo(p)}
           />
         ))}
       </div>
+
       <CreateUpdateProveedor
         open={dialogData.open}
         currentProveedor={dialogData.currentProveedor}
         close={closeDialog}
+      />
+
+      <AddArticuloProveedor
+        open={dialogDataAddArticulo.open}
+        currentProveedor={dialogDataAddArticulo.currentProveedor}
+        close={closeDialogAddArticulo}
       />
 
       <div className="w-full flex flex-col  gap-3 mt-auto">
