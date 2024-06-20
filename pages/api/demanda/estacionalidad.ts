@@ -1,8 +1,9 @@
-import CalculoIndiceEstacionalidad from "@/utils/calculoIndiceEstacionalidad";
-import sqlite3 from "sqlite3";
-import { Database, open } from "sqlite";
+import { salesData } from "@/pages/api/venta/demandaHistorica/[id]";
+import calculoIndiceEstacionalidad from "@/utils/calculoEstacionalidad";
 import { NextApiRequest, NextApiResponse } from "next";
-import { SeparetedSales } from "@/pages/api/venta/demandaHistorica/[id]";
+import { Database, open } from "sqlite";
+import sqlite3 from "sqlite3";
+
 
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
@@ -21,22 +22,29 @@ export default async function handler(
           return res.status(405).json({ message: "Method Not Allowed" });
       }
 
-      const {
-        data,
-        amoutOfCycles,
-        startDate,
-        endDate,
-        typePeriod
-      } = req.body;
+      const { id, start_date, end_date, period, cycle, estimatedSales } = req.body;
 
+      const sales: salesData[] = await db.all(
+        `
+              SELECT Venta.id as id, Articulo.nombre as name, Venta.cantidad as quantity, Venta.fecha as date FROM Venta
+              join Articulo on Venta.articulo_id = Articulo.id
+              where 
+                  Venta.articulo_id = ?
+                  and Venta.fecha >= ?
+                  and Venta.fecha <= ?
+              order by Venta.fecha asc
+              `,
+        [id, start_date, end_date]
+      );
 
-      if (!data || !amoutOfCycles || !startDate || !endDate || !typePeriod) {
-          return res.status(400).json({ message: "Missing fields" });
-      }
+      const quantityPeriod = Number(period.split("-")[0]);
+      const typeOfPeriod = period.split("-")[1];
 
-      const result = CalculoIndiceEstacionalidad(data, amoutOfCycles, startDate, endDate, typePeriod);
+      const quantityCycle = Number(cycle.split("-")[0]);
+      const typeOfCycle = cycle.split("-")[1];
 
-      res.status(200).json(result);
+      const seasonalIndex = calculoIndiceEstacionalidad(sales, typeOfPeriod, quantityPeriod, start_date, end_date, typeOfCycle, quantityCycle, estimatedSales);
+      res.status(200).json({ seasonalIndex });
 
   } catch (error:any) {
     res.status(500).json({ message: error.message });
