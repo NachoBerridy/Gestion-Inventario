@@ -1,10 +1,9 @@
-import sqlite3 from "sqlite3";
-import {SeparetedSales} from "../venta/demandaHistorica/[id]";
-import { NextApiRequest, NextApiResponse } from "next";
-import { DateTime } from "luxon";
 import averageAbsoluteDeviation from "@/utils/averageAbsoluteDeviation";
-import meanSquareError from "@/utils/meanSquaredError";
 import meanAbsolutePercentageError from "@/utils/meanAbsolutePercentageError";
+import meanSquareError from "@/utils/meanSquaredError";
+import { DateTime } from "luxon";
+import { NextApiRequest, NextApiResponse } from "next";
+import { SeparetedSales } from "../venta/demandaHistorica/[id]";
 // salesInPeriod: salesData[];
 // quantity: number;
 // periodStart?: DateTime;
@@ -101,13 +100,15 @@ export default async function handler(
         if (req.method !== "POST") {
             return res.status(405).json({ message: "Method Not Allowed" });
         }
-       let {
-        historicalDemand = demandaHistorica,
-        alfa = 0.2,
-        initialValue = historicalDemand[0].quantity,
-        errorMetod = "MAD", // MAD, MSE, MAPE
-        allowedError = 0.1,
-       } = req.body;
+    //    let {
+    //     historicalDemand = demandaHistorica,
+    //     alfa = 0.2,
+    //     initialValue = historicalDemand[0].quantity,
+    //     errorMetod = "MAD", // MAD, MSE, MAPE
+    //     allowedError = 0.1,
+    //    } = req.body;
+
+        let { historicalDemand, alfa, initialValue, errorMetod, allowedError } = req.body;
 
         let prediction = historicalDemand.map((period:SeparetedSales, index:number) => {
             const prediction = initialValue + alfa * (period.quantity - initialValue);
@@ -130,7 +131,11 @@ export default async function handler(
             error = meanAbsolutePercentageError(predictions, real)
         }
         const nexPeriod = prediction[prediction.length -1]
+        console.log('lastHistoricalDemand', historicalDemand[historicalDemand.length -1])
+        console.log('historicalDemandLength', historicalDemand.length)
+        console.log("length", prediction.length)
         prediction.pop()
+        console.log("length", prediction.length)
         
         //agrego el periodo a las predicciones
         for (let i = 0; i < prediction.length; i++) {
