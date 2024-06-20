@@ -111,7 +111,56 @@ export default async function handler(
        
 
         //prediccion con promedio movil ponderado 
-        const prediction = []
+        // const prediction = []
+        // for (let i = 0; i < historicalDemand.length-backPeriods.periods; i++) {
+        //     let sum = 0
+        //     for (let j = 0; j < backPeriods.periods; j++) {
+        //         sum += historicalDemand[i+j].quantity * backPeriods.ponderation[j]
+        //     }
+        //     const value = sum / backPeriods.ponderation.reduce((acc:number, value:number) => acc + value, 0)
+        //     prediction.push(Math.round(value))
+        // }
+        
+
+        // let error = null
+        // const real = historicalDemand.map((period:SeparetedSales) => period.quantity).slice(backPeriods.periods)
+
+        // const predictions = prediction
+
+        // if (errorMetod === "MSE"){   
+        //     error = meanSquareError(predictions, real)
+        // }
+        // if (errorMetod === "MAD"){
+        //     error = averageAbsoluteDeviation(predictions, real)
+        // }
+        // if (errorMetod === "MAPE"){
+        //     error = meanAbsolutePercentageError(predictions, real)
+        // }
+     
+
+        // // calcualar el proximo periodo con los ultimos backPeriods del historico
+        // let nexPeriod = historicalDemand.slice(-backPeriods.periods).reduce((acc:number, period:SeparetedSales, index:number) => acc + period.quantity * backPeriods.ponderation[index], 0) / backPeriods.ponderation.reduce((acc:number, value:number) => acc + value, 0)
+        // nexPeriod = Math.round(nexPeriod)
+        // //agrego el periodo a las predicciones
+        // for (let i = 0; i < prediction.length; i++) {
+        //     prediction[i] = {
+        //         prediction: prediction[i],
+        //         periodStart: historicalDemand[i+backPeriods.periods].periodStart,
+        //         periodEnd: historicalDemand[i+backPeriods.periods].periodEnd
+        //     }
+            
+        // }
+        // const predictionDemand = prediction.slice(backPeriods, prediction.length)
+        const {predictionDemand, nexPeriod, error} = getPredictionPMP(historicalDemand, backPeriods, errorMetod)
+        return res.status(200).json({predictionDemand, nexPeriod, error})
+    }
+    catch (error: any) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export function getPredictionPMP(historicalDemand:SeparetedSales[], backPeriods:{periods:number, ponderation:number[]}, errorMetod:string){
+    const prediction = []
         for (let i = 0; i < historicalDemand.length-backPeriods.periods; i++) {
             let sum = 0
             for (let j = 0; j < backPeriods.periods; j++) {
@@ -122,7 +171,7 @@ export default async function handler(
         }
         
 
-        let error = null
+        let error = 0
         const real = historicalDemand.map((period:SeparetedSales) => period.quantity).slice(backPeriods.periods)
 
         const predictions = prediction
@@ -150,10 +199,6 @@ export default async function handler(
             }
             
         }
-        const predictionDemand = prediction.slice(backPeriods, prediction.length)
-        return res.status(200).json({prediction: predictionDemand, nexPeriod, error})
-    }
-    catch (error: any) {
-        return res.status(500).json({ message: error.message });
-    }
+        const predictionDemand = prediction.slice(backPeriods.periods, prediction.length)
+        return {predictionDemand, nexPeriod, error}
 }

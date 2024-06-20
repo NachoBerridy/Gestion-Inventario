@@ -110,46 +110,80 @@ export default async function handler(
 
         let { historicalDemand, alfa, initialValue, errorMetod } = req.body;
 
-        let prediction = historicalDemand.map((period:SeparetedSales, index:number) => {
-            const prediction = initialValue + alfa * (period.quantity - initialValue);
+        // let prediction = historicalDemand.map((period:SeparetedSales, index:number) => {
+        //     const prediction = initialValue + alfa * (period.quantity - initialValue);
 
-            //TODO: Implementar el calculo del error
-            initialValue = prediction;
-            return Math.round(prediction)
-        })
-        let error = null
-        const real = historicalDemand.map((period:SeparetedSales) => period.quantity).slice(1) // Eliminamos el primer periodo ya que no se puede calcular el error
-        const predictions = prediction.slice(0, prediction.length -1) // Eliminamos el ultimo periodo porque es el que se va a predecir
+        //     //TODO: Implementar el calculo del error
+        //     initialValue = prediction;
+        //     return Math.round(prediction)
+        // })
+        // let error = null
+        // const real = historicalDemand.map((period:SeparetedSales) => period.quantity).slice(1) // Eliminamos el primer periodo ya que no se puede calcular el error
+        // const predictions = prediction.slice(0, prediction.length -1) // Eliminamos el ultimo periodo porque es el que se va a predecir
         
-        if (errorMetod === "MSE"){   
-            error = meanSquareError(predictions, real)
-        }
-        if (errorMetod === "MAD"){
-            error = averageAbsoluteDeviation(predictions, real)
-        }
-        if (errorMetod === "MAPE"){
-            error = meanAbsolutePercentageError(predictions, real)
-        }
-        const nexPeriod = prediction[prediction.length -1]
-        console.log('lastHistoricalDemand', historicalDemand[historicalDemand.length -1])
-        console.log('historicalDemandLength', historicalDemand.length)
-        console.log("length", prediction.length)
-        prediction.pop()
-        console.log("length", prediction.length)
+        // if (errorMetod === "MSE"){   
+        //     error = meanSquareError(predictions, real)
+        // }
+        // if (errorMetod === "MAD"){
+        //     error = averageAbsoluteDeviation(predictions, real)
+        // }
+        // if (errorMetod === "MAPE"){
+        //     error = meanAbsolutePercentageError(predictions, real)
+        // }
+        // const nexPeriod = prediction[prediction.length -1]
+        // prediction.pop()
         
-        //agrego el periodo a las predicciones
-        for (let i = 0; i < prediction.length; i++) {
-            prediction[i] = {
-                prediction: prediction[i],
-                periodStart: historicalDemand[i+1].periodStart,
-                periodEnd: historicalDemand[i+1].periodEnd
-            }
+        // //agrego el periodo a las predicciones
+        // for (let i = 0; i < prediction.length; i++) {
+        //     prediction[i] = {
+        //         prediction: prediction[i],
+        //         periodStart: historicalDemand[i+1].periodStart,
+        //         periodEnd: historicalDemand[i+1].periodEnd
+        //     }
             
-        }
+        // }
 
+        const {prediction, nexPeriod, error} = getPredictionPMPE(historicalDemand, alfa, initialValue, errorMetod)
         return res.status(200).json({prediction, nexPeriod, error})
     }
     catch (error: any) {
         return res.status(500).json({ message: error.message });
     }
+}
+
+export function getPredictionPMPE(historicalDemand:SeparetedSales[], alfa:number, initialValue:number, errorMetod:string){
+    let prediction = historicalDemand.map((period:SeparetedSales, index:number) => {
+        const prediction = initialValue + alfa * (period.quantity - initialValue);
+
+        //TODO: Implementar el calculo del error
+        initialValue = prediction;
+        return Math.round(prediction)
+    })
+    let error = 0
+    const real = historicalDemand.map((period:SeparetedSales) => period.quantity).slice(1) // Eliminamos el primer periodo ya que no se puede calcular el error
+    const predictions = prediction.slice(0, prediction.length -1) // Eliminamos el ultimo periodo porque es el que se va a predecir
+    
+    if (errorMetod === "MSE"){   
+        error = meanSquareError(predictions, real)
+    }
+    if (errorMetod === "MAD"){
+        error = averageAbsoluteDeviation(predictions, real)
+    }
+    if (errorMetod === "MAPE"){
+        error = meanAbsolutePercentageError(predictions, real)
+    }
+    const nexPeriod = prediction[prediction.length -1]
+    prediction.pop()
+    
+    //agrego el periodo a las predicciones
+    for (let i = 0; i < prediction.length; i++) {
+        //@ts-ignore
+        prediction[i] = {
+            prediction: prediction[i],
+            periodStart: historicalDemand[i+1].periodStart,
+            periodEnd: historicalDemand[i+1].periodEnd
+        }
+        
+    }
+    return {prediction, nexPeriod, error}
 }
