@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import ModalPesos from "./pesosPMP";
 
 export interface DataLinealChart {
     periodo: string;
@@ -85,7 +86,8 @@ export default function LinealChart() {
   const [initialValue, setInitialValue] = useState<number>(0);
   const [alfa, setAlfa] = useState<number>(0.2);
   const [backPeriods, setBackPeriods] = useState<number>(3);
-
+  const [weights, setWeights] = useState<number[]>(Array.from({length: backPeriods}, (_, i) => i + 1));
+  const [selectWeights, setSelectWeights] = useState<boolean>(false);
 
   const getArticulos = async () => {
     //Get Articulos
@@ -128,7 +130,7 @@ export default function LinealChart() {
         historicalDemand: response.data,
         backPeriods: {
           periods: backPeriods,
-          ponderation: Array.from({length: backPeriods}, (_, i) => i + 1),
+          ponderation: weights,
         },
         errorMetod: typeOfError,
       }
@@ -190,6 +192,12 @@ export default function LinealChart() {
     }
   }
 
+  const handleWeightsChange = (weights: number[]) => {
+    setWeights(weights);
+    setSelectWeights(false);
+    fetchData();
+  }
+  
   useEffect(() => {
     getArticulos();
   }, []);
@@ -203,9 +211,12 @@ export default function LinealChart() {
   }, [amounOfPeriods, periodName]);
 
   useEffect(() => {
+    setWeights(Array.from({length: backPeriods}, (_, i) => i + 1));
+  }, [backPeriods]);
+
+  useEffect(() => {
     fetchData();
   }, [id, startDate, endDate, period, typeOfPrediction, typeOfError , allowedError, alfa, initialValue, backPeriods]);
-
 
   return (
     <div className="flex  items-start gap-4 rounded-lg p-4 bg-gray-700 shadow-lg w-fit text-white">
@@ -326,9 +337,14 @@ export default function LinealChart() {
                     id="backPeriods" 
                     name="backPeriods" 
                     value={backPeriods} 
+                    min={1}
                     onChange={(e) => setBackPeriods(Number(e.target.value))} 
                     className="w-16 rounded-lg py-1 px-2 focus:outline-none focus:ring-none focus:border-transparent text-black"
                   />
+                  {
+                    typeOfPrediction === "Promedio Movil Ponderado" &&
+                    < button onClick={() => setSelectWeights(true)} className="bg-contrast p-2 rounded-lg">Cambiar Pesos</button>
+                  }
                 </div>
               }
             </div>
@@ -382,6 +398,10 @@ export default function LinealChart() {
           <Line type="monotone" dataKey="prediccion" stroke="#2E86C1" yAxisId={0} />
         </LineChart>
       </div>
+      {
+        selectWeights &&
+        <ModalPesos setWeights={handleWeightsChange} weights={weights} setShow={setSelectWeights} />
+      }
     </div>
   );
 }
