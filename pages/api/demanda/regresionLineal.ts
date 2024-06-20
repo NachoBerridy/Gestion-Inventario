@@ -63,7 +63,6 @@ export default function handler(
         let {
             historicalDemand =  demandaHistorica,
             errorMetod = "MAD", // MAD, MSE, MAPE
-            allowedError = 0.1,
         } = req.body;
         const xy = historicalDemand.map((item:SeparetedSales, index:number) => {
             return ((index + 1)*item.quantity)

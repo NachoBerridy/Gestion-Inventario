@@ -15,7 +15,7 @@ import {
 export interface DataLinealChart {
     periodo: string;
     real: number | null;
-    prediccion: number | null;
+    prediccion?: number | null;
 } 
 
 interface articles{
@@ -35,7 +35,6 @@ interface predictionParamsPMPE{
   alfa: number;
   initialValue: number;
   errorMetod: string;
-  allowedError: number;
 }
 
 interface predictionParamsPMP{
@@ -45,7 +44,12 @@ interface predictionParamsPMP{
     ponderation: number[];
   };
   errorMetod: string;
-  allowedError: number;
+}
+
+interface predictionParamsRL{
+  historicalDemand: SeparetedSales[];
+  errorMetod: string;
+
 }
 
 
@@ -53,7 +57,6 @@ interface predictionParamsPM{
   historicalDemand: SeparetedSales[];
   backPeriods: number;
   errorMetod: string;
-  allowedError: number;
 }
 
 enum colorsToError{
@@ -79,6 +82,9 @@ export default function LinealChart() {
   const [allowedError, setAllowedError] = useState<number>(0.1);
   const [error, setError] = useState<number>(0);
   const [nextPeriod, setNextPeriod] = useState<number>(0);
+  const [initialValue, setInitialValue] = useState<number>(0);
+  const [alfa, setAlfa] = useState<number>(0.2);
+  const [backPeriods, setBackPeriods] = useState<number>(3);
 
 
   const getArticulos = async () => {
@@ -109,33 +115,35 @@ export default function LinealChart() {
     });
 
     //set parameters for prediction
-    let params: predictionParamsPMPE | predictionParamsPMP | predictionParamsPM = {} as any;
+    let params: predictionParamsPMPE | predictionParamsPMP | predictionParamsPM | predictionParamsRL = {} as any;
     if (typeOfPrediction === "Promedio Movil Suavizado Exponencialmente") {
       params = {
         historicalDemand: response.data,
-        alfa: 0.2,
-        initialValue: response.data[0].quantity,
+        alfa: alfa,
+        initialValue: initialValue,
         errorMetod: typeOfError,
-        allowedError: 0.1,
       }
     } else if (typeOfPrediction === "Promedio Movil Ponderado") {
       params = {
         historicalDemand: response.data,
         backPeriods: {
-          periods: 3,
-          ponderation: [1, 2, 3],
+          periods: backPeriods,
+          ponderation: Array.from({length: backPeriods}, (_, i) => i + 1),
         },
         errorMetod: typeOfError,
-        allowedError: 0.1,
       }
     } else if (typeOfPrediction === "Promedio Movil") {
       params = {
         historicalDemand: response.data,
-        backPeriods: 3,
+        backPeriods: backPeriods,
         errorMetod: typeOfError,
-        allowedError: 0.1,
       }
-    }
+    } else if (typeOfPrediction === "Regresión Lineal") {
+      params = {
+        historicalDemand: response.data,
+        errorMetod: typeOfError,
+      }
+    } 
 
     const predictions = await getPrediction(params);
     setError(predictions.error);
@@ -147,10 +155,14 @@ export default function LinealChart() {
 
     //@ts-ignore
     const newData = newformatedData.map((item, index) => {
-      if (index === 0) {
+      if (index === 0 && typeOfPrediction === "Promedio Movil Suavizado Exponencialmente") {
         return {
-          ...item,
-          prediccion: 0,
+          ...item
+        }
+      }
+      if (index < backPeriods && (typeOfPrediction === "Promedio Movil Ponderado" || typeOfPrediction === "Promedio Movil")) {
+        return {
+          ...item
         }
       }
       return {
@@ -158,10 +170,11 @@ export default function LinealChart() {
           prediccion: predictionArray[index-1],
       }
     });
+
     setFormatedData(newData);
   }
 
-  const getPrediction = async (params: predictionParamsPMPE | predictionParamsPMP | predictionParamsPM) => {
+  const getPrediction = async (params: predictionParamsPMPE | predictionParamsPMP | predictionParamsPM | predictionParamsRL) => {
     if (typeOfPrediction === "Promedio Movil Suavizado Exponencialmente") {
       const response = await axios.post(`/api/demanda/pmpe`, params);
       return response.data;
@@ -171,8 +184,9 @@ export default function LinealChart() {
     } else if (typeOfPrediction === "Promedio Movil") {
       const response = await axios.post(`/api/demanda/promediomovil`, params);
       return response.data;
-    } else {
-      return null;
+    } else if (typeOfPrediction === "Regresión Lineal") {
+      const response = await axios.post(`/api/demanda/regresionLineal`, params);
+      return response.data;
     }
   }
 
@@ -190,7 +204,7 @@ export default function LinealChart() {
 
   useEffect(() => {
     fetchData();
-  }, [id, startDate, endDate, period, typeOfPrediction, typeOfError]);
+  }, [id, startDate, endDate, period, typeOfPrediction, typeOfError , allowedError, alfa, initialValue, backPeriods]);
 
 
   return (
@@ -251,6 +265,7 @@ export default function LinealChart() {
                   name="periodName" 
                   id="periodName" 
                   onChange={(e) => setPeriodName(e.target.value)} 
+                  value={periodName}
                   className="text-black w-20 rounded-lg py-1 px-2 focus:outline-none focus:ring-none focus:border-transparent"
                 >
                   {Object.keys(periodNames).map((key) => (
@@ -270,7 +285,52 @@ export default function LinealChart() {
                 <option value="Promedio Movil Suavizado Exponencialmente">Promedio Movil Suavizado Exponencialmente</option>
                 <option value="Promedio Movil Ponderado">Promedio Movil Ponderado</option>
                 <option value="Promedio Movil">Promedio Movil</option>
+                <option value="Regresión Lineal">Regresión Lineal</option>
               </select>
+            </div>
+            <div className="flex gap-2 items-center w-full justify-between">
+              {
+                typeOfPrediction === "Promedio Movil Suavizado Exponencialmente" &&
+                <div className="flex gap-2 items-center w-full justify-between">
+                  <label htmlFor="alfa">Alfa</label>
+                  <input 
+                    type="number" 
+                    id="alfa" 
+                    name="alfa" 
+                    value={alfa} 
+                    onChange={(e) => setAlfa(Number(e.target.value))} 
+                    className="w-16 rounded-lg py-1 px-2 focus:outline-none focus:ring-none focus:border-transparent text-black"
+                  />
+                </div>
+              }
+              {
+                typeOfPrediction === "Promedio Movil Suavizado Exponencialmente" &&
+                <div className="flex gap-2 items-center w-full justify-between">
+                  <label htmlFor="initialValue">Valor Inicial</label>
+                  <input 
+                    type="number" 
+                    id="initialValue" 
+                    name="initialValue" 
+                    value={initialValue} 
+                    onChange={(e) => setInitialValue(Number(e.target.value))} 
+                    className="w-16 rounded-lg py-1 px-2 focus:outline-none focus:ring-none focus:border-transparent text-black"
+                  />
+                </div>
+              }
+              {
+                (typeOfPrediction === "Promedio Movil Ponderado" || typeOfPrediction === "Promedio Movil") &&
+                <div className="flex gap-2 items-center w-full justify-between">
+                  <label htmlFor="backPeriods">Periodos Atras</label>
+                  <input 
+                    type="number" 
+                    id="backPeriods" 
+                    name="backPeriods" 
+                    value={backPeriods} 
+                    onChange={(e) => setBackPeriods(Number(e.target.value))} 
+                    className="w-16 rounded-lg py-1 px-2 focus:outline-none focus:ring-none focus:border-transparent text-black"
+                  />
+                </div>
+              }
             </div>
             <div className="flex gap-2 items-center w-full justify-between">
               <label htmlFor="typeOfError">Tipo de Error</label>

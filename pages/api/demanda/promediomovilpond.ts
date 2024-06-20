@@ -107,7 +107,6 @@ export default async function handler(
             ponderation : [1, 2, 3]
         },
         errorMetod = "MAD", // MAD, MSE, MAPE
-        allowedError = 0.1,
        } = req.body;
        
 

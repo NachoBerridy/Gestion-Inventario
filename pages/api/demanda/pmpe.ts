@@ -108,7 +108,7 @@ export default async function handler(
     //     allowedError = 0.1,
     //    } = req.body;
 
-        let { historicalDemand, alfa, initialValue, errorMetod, allowedError } = req.body;
+        let { historicalDemand, alfa, initialValue, errorMetod } = req.body;
 
         let prediction = historicalDemand.map((period:SeparetedSales, index:number) => {
             const prediction = initialValue + alfa * (period.quantity - initialValue);

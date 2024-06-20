@@ -104,7 +104,6 @@ export default async function handler(
         historicalDemand = demandaHistorica,
         backPeriods = 3,
         errorMetod = "MAD", // MAD, MSE, MAPE
-        allowedError = 0.1,
        } = req.body;
        
         //prediccion con promedio movil
