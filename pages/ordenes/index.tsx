@@ -3,7 +3,10 @@ import CrearNuevaOrden from "@/components/OrdenesDeCompra/CrearNuevaOrden";
 import EditarOrdenDeCompra from "@/components/OrdenesDeCompra/EditarOrdenDeCompra";
 import { IOrdenCompra, newOrder } from "@/pages/api/ordenes";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+
 interface EditPayload {
   id: number;
   estado: string;
