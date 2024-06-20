@@ -4,8 +4,8 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-color: #889C9B;
-  --secondary-color: #B2BEBF;
+  --background-color: #889c9b;
+  --secondary-color: #b2bebf;
 }
 
 @media (prefers-color-scheme: dark) {

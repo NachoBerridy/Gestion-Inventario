@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import axios from "axios";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Articulo } from "../../pages/api/articulos";
 
@@ -10,7 +10,10 @@ export default function UpdateArticle ({toggleUpdate,updateArticle,id}:{ toggleU
     const [precio, setPrecio] = useState<number>(0);
     const [modelo_inventario, setModeloInventario] = useState<string>("");
     const [tasaRotacion, setTasaRotacion] = useState<number>(0);
-    
+    const inventaryOptions = [
+        "LOTE FIJO",
+        "INTERVALO FIJO"
+    ]
 
     const fetchData = async () => {
         try {
@@ -59,13 +62,17 @@ export default function UpdateArticle ({toggleUpdate,updateArticle,id}:{ toggleU
                     <label htmlFor="nombre">Nombre</label>
                     <input type="text" name="nombre" id="nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} />
                     <label htmlFor="stock">Stock</label>
-                    <input type="number" name="stock" id="stock" value={stock} onChange={(e) => setStock(parseInt(e.target.value))} />
+                    <input type="number"  name="stock" id="stock" value={stock} onChange={(e) => setStock(parseInt(e.target.value))} />
                     <label htmlFor="precio">Precio</label>
-                    <input type="number" name="precio" id="precio" value={precio} onChange={(e) => setPrecio(parseInt(e.target.value))} />
+                    <input type="number" step={0.01} min={0.01} name="precio" id="precio" value={precio} onChange={(e) => setPrecio(parseFloat(e.target.value))} />
                     <label htmlFor="modelo_inventario">Modelo de Inventario</label>
-                    <input type="text" name="modelo_inventario" id="modelo_inventario" value={modelo_inventario} onChange={(e) => setModeloInventario(e.target.value)} />
+                    <select name="modelo_inventario" id="modelo_inventario" value={modelo_inventario} onChange={(e) => setModeloInventario(e.target.value)}>
+                        {inventaryOptions.map((option) => (
+                            <option key={option} value={option}>{option}</option>
+                        ))}
+                    </select>
                     <label htmlFor="tasaRotacion">Tasa de Rotación</label>
-                    <input type="number" name="tasaRotacion" id="tasaRotacion" value={tasaRotacion} onChange={(e) => setTasaRotacion(parseFloat(e.target.value))} />
+                    <input type="number" step={0.01} min={0.01} name="tasaRotacion" id="tasaRotacion" value={tasaRotacion} onChange={(e) => setTasaRotacion(parseFloat(e.target.value))} />
                     <button className="bg-blue-500 text-white p-2 rounded-md" type="button" onClick={update}>Actualizar Artículo</button>
                 </form>
             </div>

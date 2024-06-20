@@ -1,15 +1,12 @@
 import { Inter } from "next/font/google";
 import LandingPage from "./LandingPage";
-import Navbar from "@/components/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   return (
-    <main
-     style={{width:'100vw', height:'100vh',display:'flex'}}
-    >
-      <LandingPage/>
+    <main style={{ width: "100vw", height: "100vh", display: "flex" }}>
+      <LandingPage />
     </main>
   );
 }

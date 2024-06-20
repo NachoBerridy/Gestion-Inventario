@@ -1,25 +1,25 @@
-import sqlite3 from "sqlite3";
-import { Database, open } from "sqlite";
 import { NextApiRequest, NextApiResponse } from "next";
+import { Database, open } from "sqlite";
+import sqlite3 from "sqlite3";
 
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
-const MODELOINVENTARIO = 'LOTE FIJO' // Sacar de tabla configs o del env
+const MODELOINVENTARIO = "LOTE FIJO"; // Sacar de tabla configs o del env
 
 export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<any>,
+  req: NextApiRequest,
+  res: NextApiResponse<any>
 ) {
-    try {
-        if (!db) {
-            db = await open({
-                filename: "./db/test.db",
-                driver: sqlite3.Database,
-            });
-        }
-        if (req.method !== "POST") {
-            return res.status(405).json({ message: "Method Not Allowed" });
-        }
+  try {
+    if (!db) {
+      db = await open({
+        filename: "./db/test.db",
+        driver: sqlite3.Database,
+      });
+    }
+    if (req.method !== "POST") {
+      return res.status(405).json({ message: "Method Not Allowed" });
+    }
 
         //TODO agregar modelo de inventario,stock de seg, y punto de pedido. agregar tambien en la tabla de articulo
         let { nombre, stock, precio,modeloInventario, tasaRotacion}:{nombre:String, stock:Number,precio:Number,modeloInventario:string, tasaRotacion:number} = req.body;
