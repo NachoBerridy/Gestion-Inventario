@@ -4,18 +4,18 @@ import { Database, open } from "sqlite";
 import sqlite3 from "sqlite3";
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
-interface salesData {
-  id: number;
-  name: string;
-  quantity: number;
-  date: string;
+export interface salesData {
+    id: number;
+    name: string;
+    quantity: number;
+    date: string;
 }
 
 export interface SeparetedSales {
-  salesInPeriod: salesData[];
-  quantity: number;
-  periodStart?: DateTime;
-  periodEnd?: DateTime;
+    salesInPeriod: salesData[];
+    quantity: number;
+    periodStart: DateTime;
+    periodEnd: DateTime;
 }
 
 export default async function handler(
