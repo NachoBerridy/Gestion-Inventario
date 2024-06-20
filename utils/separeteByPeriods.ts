@@ -1,112 +1,6 @@
-import separateByPeriods from "@/utils/separeteByPeriods";
+import { SeparetedSales, salesData } from "@/pages/api/venta/demandaHistorica/[id]";
 import { DateTime } from "luxon";
-import { NextApiRequest, NextApiResponse } from "next";
-import { Database, open } from "sqlite";
-import sqlite3 from "sqlite3";
-let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
-export interface salesData {
-    id: number;
-    name: string;
-    quantity: number;
-    date: string;
-}
-
-export interface SeparetedSales {
-    salesInPeriod: salesData[];
-    quantity: number;
-    periodStart: DateTime;
-    periodEnd: DateTime;
-}
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<any>
-) {
-  try {
-    if (!db) {
-      db = await open({
-        filename: "./db/test.db",
-        driver: sqlite3.Database,
-      });
-    }
-    if (req.method !== "POST") {
-      return res.status(405).json({ message: "Method Not Allowed" });
-    }
-    // const { id, start_date, end_date, period }: query = req.query;
-
-    const id = req.query.id;
-    // const url = new URL(req.url || '', `http://${req.headers.host}`);
-    // const start_date = url.searchParams.get('start_date');
-    // const end_date = url.searchParams.get('end_date');
-    // const period = url.searchParams.get('period'); // formato 1-d, 2-w, 3-m, 4-y, donde 1 es la cantidad por periodo y d es el tipo de periodo (d-dia, w-semana, m-mes, y-año)
-
-    const { start_date, end_date, period } = req.body;
-
-    if (!id || !start_date || !end_date || !period) {
-      return res.status(400).json({ message: "Missing fields" });
-    }
-
-    const quantityPeriod = Number(period.split("-")[0]);
-    const typePeriod = period.split("-")[1];
-
-    const sales: salesData[] = await db.all(
-      `
-            SELECT Venta.id as id, Articulo.nombre as name, Venta.cantidad as quantity, Venta.fecha as date FROM Venta
-            join Articulo on Venta.articulo_id = Articulo.id
-            where 
-                Venta.articulo_id = ?
-                and Venta.fecha >= ?
-                and Venta.fecha <= ?
-            order by Venta.fecha asc
-            `,
-      [id, start_date, end_date]
-    );
-    let separetedSales: SeparetedSales[];
-    // switch (typePeriod) {
-    //   case "d":
-    //     separetedSales = separeteByDays(
-    //       start_date,
-    //       end_date,
-    //       quantityPeriod,
-    //       sales
-    //     );
-    //     break;
-    //   case "w":
-    //     separetedSales = separeteByWeeks(
-    //       start_date,
-    //       end_date,
-    //       quantityPeriod,
-    //       sales
-    //     );
-    //     break;
-    //   case "m":
-    //     separetedSales = separeteByMonths(
-    //       start_date,
-    //       end_date,
-    //       quantityPeriod,
-    //       sales
-    //     );
-    //     break;
-    //   case "y":
-    //     separetedSales = separeteByYears(
-    //       start_date,
-    //       end_date,
-    //       quantityPeriod,
-    //       sales
-    //     );
-    //     break;
-    //   default:
-    //     separetedSales = [];
-    //     break;
-    // }
-    separetedSales = separateByPeriods(typePeriod, start_date, end_date, quantityPeriod, sales);
-    return res.status(200).json(separetedSales);
-    // return res.status(200).json({sales, quantity});
-  } catch (error: any) {
-    return res.status(500).json({ message: error.message });
-  }
-}
 
 const separeteByDays = (
   start_date: string,
@@ -232,3 +126,27 @@ const separeteByYears = (
   }
   return separetedSales;
 };
+
+
+const separateByPeriods = (
+  typePeriod: string,  // 'd', 'w', 'm', 'y'
+  start_date: string, // '2022-01-01'
+  end_date: string, // '2022-12-31'
+  quantityNumber: number, // 1
+  sales: salesData[] // [{id: 1, date: '2022-01-01', quantity: 10, name: 'Product1}]
+) : SeparetedSales[] => {
+  switch (typePeriod) {
+    case 'd':
+      return separeteByDays(start_date, end_date, quantityNumber, sales)
+    case 'w':
+      return separeteByWeeks (start_date, end_date, quantityNumber, sales)
+    case 'm':
+      return separeteByMonths (start_date, end_date, quantityNumber, sales)
+    case 'y':
+      return separeteByYears (start_date, end_date, quantityNumber, sales)
+    default:
+      return separeteByDays (start_date, end_date, quantityNumber, sales)
+  }
+}
+
+export default separateByPeriods;
