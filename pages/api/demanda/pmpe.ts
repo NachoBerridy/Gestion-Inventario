@@ -87,7 +87,7 @@ const demandaHistorica : SeparetedSales[] = [
 ]
 interface predictionDemand {
     prediction: number[];
-    nexPeriod: number;
+    nextPeriod: number;
     error: number;
 }
                 
@@ -100,13 +100,15 @@ export default async function handler(
         if (req.method !== "POST") {
             return res.status(405).json({ message: "Method Not Allowed" });
         }
-       let {
-        historicalDemand = demandaHistorica,
-        alfa = 0.2,
-        initialValue = historicalDemand[0].quantity,
-        errorMetod = "MAD", // MAD, MSE, MAPE
-        allowedError = 0.1,
-       } = req.body;
+    //    let {
+    //     historicalDemand = demandaHistorica,
+    //     alfa = 0.2,
+    //     initialValue = historicalDemand[0].quantity,
+    //     errorMetod = "MAD", // MAD, MSE, MAPE
+    //     allowedError = 0.1,
+    //    } = req.body;
+
+        let { historicalDemand, alfa, initialValue, errorMetod } = req.body;
 
         // let prediction = historicalDemand.map((period:SeparetedSales, index:number) => {
         //     const prediction = initialValue + alfa * (period.quantity - initialValue);
@@ -128,7 +130,7 @@ export default async function handler(
         // if (errorMetod === "MAPE"){
         //     error = meanAbsolutePercentageError(predictions, real)
         // }
-        // const nexPeriod = prediction[prediction.length -1]
+        // const nextPeriod = prediction[prediction.length -1]
         // prediction.pop()
         
         // //agrego el periodo a las predicciones
@@ -141,8 +143,8 @@ export default async function handler(
             
         // }
 
-        const {prediction, nexPeriod, error} = getPredictionPMPE(historicalDemand, alfa, initialValue, errorMetod)
-        return res.status(200).json({prediction, nexPeriod, error})
+        const {prediction, nextPeriod, error} = getPredictionPMPE(historicalDemand, alfa, initialValue, errorMetod)
+        return res.status(200).json({prediction, nextPeriod, error})
     }
     catch (error: any) {
         return res.status(500).json({ message: error.message });
@@ -170,7 +172,7 @@ export function getPredictionPMPE(historicalDemand:SeparetedSales[], alfa:number
     if (errorMetod === "MAPE"){
         error = meanAbsolutePercentageError(predictions, real)
     }
-    const nexPeriod = prediction[prediction.length -1]
+    const nextPeriod = prediction[prediction.length -1]
     prediction.pop()
     
     //agrego el periodo a las predicciones
@@ -183,5 +185,5 @@ export function getPredictionPMPE(historicalDemand:SeparetedSales[], alfa:number
         }
         
     }
-    return {prediction, nexPeriod, error}
+    return {prediction, nextPeriod, error}
 }

@@ -87,7 +87,7 @@ const demandaHistorica : SeparetedSales[] = [
 ]
 interface predictionDemand {
     prediction: number[];
-    nexPeriod: number;
+    nextPeriod: number;
     error: number;
 }
                 
@@ -107,7 +107,6 @@ export default async function handler(
             ponderation : [1, 2, 3]
         },
         errorMetod = "MAD", // MAD, MSE, MAPE
-        allowedError = 0.1,
        } = req.body;
        
 
@@ -140,8 +139,8 @@ export default async function handler(
      
 
         // // calcualar el proximo periodo con los ultimos backPeriods del historico
-        // let nexPeriod = historicalDemand.slice(-backPeriods.periods).reduce((acc:number, period:SeparetedSales, index:number) => acc + period.quantity * backPeriods.ponderation[index], 0) / backPeriods.ponderation.reduce((acc:number, value:number) => acc + value, 0)
-        // nexPeriod = Math.round(nexPeriod)
+        // let nextPeriod = historicalDemand.slice(-backPeriods.periods).reduce((acc:number, period:SeparetedSales, index:number) => acc + period.quantity * backPeriods.ponderation[index], 0) / backPeriods.ponderation.reduce((acc:number, value:number) => acc + value, 0)
+        // nextPeriod = Math.round(nextPeriod)
         // //agrego el periodo a las predicciones
         // for (let i = 0; i < prediction.length; i++) {
         //     prediction[i] = {
@@ -152,8 +151,8 @@ export default async function handler(
             
         // }
         // const predictionDemand = prediction.slice(backPeriods, prediction.length)
-        const {predictionDemand, nexPeriod, error} = getPredictionPMP(historicalDemand, backPeriods, errorMetod)
-        return res.status(200).json({predictionDemand, nexPeriod, error})
+        const {prediction, nextPeriod, error} = getPredictionPMP(historicalDemand, backPeriods, errorMetod)
+        return res.status(200).json({prediction, nextPeriod, error})
     }
     catch (error: any) {
         return res.status(500).json({ message: error.message });
@@ -189,8 +188,8 @@ export function getPredictionPMP(historicalDemand:SeparetedSales[], backPeriods:
      
 
         // calcualar el proximo periodo con los ultimos backPeriods del historico
-        let nexPeriod = historicalDemand.slice(-backPeriods.periods).reduce((acc:number, period:SeparetedSales, index:number) => acc + period.quantity * backPeriods.ponderation[index], 0) / backPeriods.ponderation.reduce((acc:number, value:number) => acc + value, 0)
-        nexPeriod = Math.round(nexPeriod)
+        let nextPeriod = historicalDemand.slice(-backPeriods.periods).reduce((acc:number, period:SeparetedSales, index:number) => acc + period.quantity * backPeriods.ponderation[index], 0) / backPeriods.ponderation.reduce((acc:number, value:number) => acc + value, 0)
+        nextPeriod = Math.round(nextPeriod)
         //agrego el periodo a las predicciones
         for (let i = 0; i < prediction.length; i++) {
             prediction[i] = {
@@ -201,5 +200,5 @@ export function getPredictionPMP(historicalDemand:SeparetedSales[], backPeriods:
             
         }
         const predictionDemand = prediction.slice(backPeriods.periods, prediction.length)
-        return {predictionDemand, nexPeriod, error}
+        return {prediction: predictionDemand, nextPeriod, error}
 }

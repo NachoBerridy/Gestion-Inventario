@@ -81,7 +81,7 @@ const separeteByMonths = (
     const periodEnd = periodStart
       .plus({ months: quantityNumber - 1 })
       .endOf("month");
-    console.log(periodStart.toISO(), periodEnd.toISO());
+    // console.log(periodStart.toISO(), periodEnd.toISO());
     const salesInPeriod = sales.filter((sale) => {
       const date = DateTime.fromISO(sale.date);
       return date >= periodStart && date <= periodEnd;
