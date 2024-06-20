@@ -1,12 +1,12 @@
-import  LinealChart,{DataLinealChart} from './linealChart';
+import LinealChart, { DataLinealChart } from '@/components/Demanda/LinealChart';
 const data: DataLinealChart[] = []
 export default function DemandaPage() {
     const historicalDemand = []
 
     return (
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center w-screen h-screen">
 
-            <LinealChart data={data}/>
+            <LinealChart />
         </div>
     );
 }
