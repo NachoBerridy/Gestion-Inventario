@@ -3,5 +3,17 @@
 
 ###
 GET {{base-url}}/proveedores
-?pageSize=2
-&offset=5
+
+
+###
+GET {{base-url}}/proveedores
+?pageSize=5
+&offset=0
+&query=2
+
+
+###
+POST {{base-url}}/proveedores
+Content-Type: text/html; charset=utf-8
+
+nombre=Facu&domicilio=facu&correo=test%40test.com&direccion=test

@@ -3,6 +3,7 @@ export interface Articulo {
     nombre : string;
     stock : number;
     precio : number;
+    tasa_rotacion : number | null;
     stock_seguridad : number | null;
     punto_pedido : number | null;
     modelo_inventario : string | null;

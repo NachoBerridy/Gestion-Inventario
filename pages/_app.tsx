@@ -1,11 +1,11 @@
 import "@/assets/styles/globals.css";
-import type { AppProps } from "next/app";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Navbar from "@/components/Navbar";
+import type { AppProps } from "next/app";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function App({ Component, pageProps }: AppProps) {
-  return(
+  return (
     <>
       <ToastContainer />
       <div className="w-screen h-screen flex justify-start">
@@ -13,5 +13,5 @@ export default function App({ Component, pageProps }: AppProps) {
         <Component {...pageProps} />
       </div>
     </>
-  )
+  );
 }

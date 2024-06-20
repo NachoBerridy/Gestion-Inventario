@@ -1,10 +1,11 @@
 import {Articulo} from "../../../pages/api/articulos"
 import { PlusIcon, PencilSquareIcon, TrashIcon} from "@heroicons/react/24/outline";
 import { useState,useEffect } from "react";
+import UpdateArticle from "../UpdateArticulo";
 import axios from "axios";
 
 
-export default function Card({articulo, deleteArticle}: {articulo: Articulo, deleteArticle: (id: number) => void}) {
+export default function Card({articulo, deleteArticle,toggleUpdate,setId}: {articulo: Articulo, deleteArticle: (id: number) => void, toggleUpdate: () => void, setId: (id: number) => void}) {
     
     const [color, setColor] = useState<string>("white")
     const [show, setShow] = useState<boolean>(false)
@@ -30,7 +31,10 @@ export default function Card({articulo, deleteArticle}: {articulo: Articulo, del
                 break;
         }
     }
-
+    const update = () => {
+        setId(articulo.id)
+        toggleUpdate()
+    }
 
     useEffect(() => {
         changeColor()
@@ -46,8 +50,8 @@ export default function Card({articulo, deleteArticle}: {articulo: Articulo, del
                 </div>
                 <div className="flex gap-3 items-center">
 
-                    <PencilSquareIcon className="h-6 w-6 text-gray-500 cursor-pointer" />
-                    <PlusIcon className="h-6 w-6 text-gray-500 cursor-pointer" />
+                    <PencilSquareIcon className="h-6 w-6 text-gray-500 cursor-pointer" onClick={update}/>
+                    {/* <PlusIcon className="h-6 w-6 text-gray-500 cursor-pointer" /> */}
                     <TrashIcon className="h-6 w-6 text-gray-500 cursor-pointer"  onClick={() => setDeleteModal(true)}/>
                 </div>
             </div>

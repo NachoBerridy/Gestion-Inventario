@@ -1,14 +1,18 @@
 import CardOrdenDeCompra from "@/components/OrdenesDeCompra/CardOrdenDeCompra";
-import EditarOrdenDeCompra from "@/components/OrdenesDeCompra/EditarOrdenDeCompra";
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { IOrdenCompra } from "@/pages/api/ordenes";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import CrearNuevaOrden from "@/components/OrdenesDeCompra/CrearNuevaOrden";
-import { newOrder } from "@/pages/api/ordenes";
+import EditarOrdenDeCompra from "@/components/OrdenesDeCompra/EditarOrdenDeCompra";
+import { IOrdenCompra, newOrder } from "@/pages/api/ordenes";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+
 interface EditPayload {
-  id: number, estado: string, fecha: string, cantidad: number, articuloProveedorId: number
+  id: number;
+  estado: string;
+  fecha: string;
+  cantidad: number;
+  articuloProveedorId: number;
 }
 export default function OrdenesDeCompra() {
   const [orders, setOrders] = useState<IOrdenCompra[]>([]);
@@ -20,17 +24,17 @@ export default function OrdenesDeCompra() {
   const [filteredOrders, setFilteredOrders] = useState<IOrdenCompra[]>([]);
   const [page, setPage] = useState<number>(1);
   const amount = 5;
-  const [ displayOrders, setDisplayOrders ] = useState<IOrdenCompra[]>([]);
+  const [displayOrders, setDisplayOrders] = useState<IOrdenCompra[]>([]);
 
   const handlePageChange = (page: number) => {
     setPage(page);
     setDisplayOrders(filteredOrders.slice((page - 1) * amount, page * amount));
-  }
+  };
 
   const selectOrder = (id: number) => {
     setOrderId(id);
     setShowEdit(true);
-  }
+  };
 
   const fetchOrdenes = async () => {
     try {
@@ -42,7 +46,7 @@ export default function OrdenesDeCompra() {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   const deleteOrder = async (id: number) => {
     try {
@@ -53,29 +57,42 @@ export default function OrdenesDeCompra() {
       toast.error("Error al eliminar la orden de compra");
       console.error(error);
     }
-  }
+  };
 
   const createOrder = async (order: newOrder, send: boolean) => {
     try {
       const orderId = await axios.post("/api/ordenes/create", order);
-      send && await axios.put("/api/ordenes/update", { ...order, id: orderId.data.id, estado: "Enviado", fecha: new Date().toISOString().split("T")[0]});
+      send &&
+        (await axios.put("/api/ordenes/update", {
+          ...order,
+          id: orderId.data.id,
+          estado: "Enviado",
+          fecha: new Date().toISOString().split("T")[0],
+        }));
       setShowNew(false);
       fetchOrdenes();
       toast.success("Orden de compra creada exitosamente");
     } catch (error) {
       toast.error("Error al crear la orden de compra");
     }
-  }
+  };
 
-  const reciveOrder = async (id: number, date = new Date().toISOString().split("T")[0]) => {
+  const reciveOrder = async (
+    id: number,
+    date = new Date().toISOString().split("T")[0]
+  ) => {
     try {
-      await axios.put("/api/ordenes/update", {id, estado: "Recibida", fecha: date});
+      await axios.put("/api/ordenes/update", {
+        id,
+        estado: "Recibida",
+        fecha: date,
+      });
       fetchOrdenes();
       toast.success("Orden de compra recibida exitosamente");
     } catch (error) {
       toast.error("Error al recibir la orden de compra");
     }
-  }
+  };
 
   const updateOrder = async (payload: EditPayload) => {
     try {
@@ -86,31 +103,32 @@ export default function OrdenesDeCompra() {
     } catch (error) {
       toast.error("Error al actualizar la orden de compra");
     }
-  }
+  };
 
   const handleFilter = () => {
     let tempOrders = orders;
     if (searchArticle) {
-      tempOrders = tempOrders.filter(order => order.articulo.toLowerCase().includes(searchArticle.toLowerCase()));
+      tempOrders = tempOrders.filter((order) =>
+        order.articulo.toLowerCase().includes(searchArticle.toLowerCase())
+      );
     }
     if (searchProvider) {
-      tempOrders = tempOrders.filter(order => order.proveedor.toLowerCase().includes(searchProvider.toLowerCase()));
+      tempOrders = tempOrders.filter((order) =>
+        order.proveedor.toLowerCase().includes(searchProvider.toLowerCase())
+      );
     }
     setFilteredOrders(tempOrders);
     setDisplayOrders(tempOrders.slice((page - 1) * amount, page * amount));
     setPage(1); // Reset to the first page on new filter
-  }
-
+  };
 
   useEffect(() => {
-
     fetchOrdenes();
   }, []);
 
   useEffect(() => {
     handleFilter();
   }, [searchArticle, searchProvider, orders]);
-
 
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-center text-blackcon">
@@ -131,13 +149,11 @@ export default function OrdenesDeCompra() {
             className="border p-2 rounded"
           />
         </div>
-        {
-          displayOrders.length === 0 
-          ? 
+        {displayOrders.length === 0 ? (
           <p className="text-center font-semibold text-xl">
             No hay órdenes de compra con esos criterios de búsqueda
           </p>
-          :
+        ) : (
           <table className="w-full bg-white text-black">
             <thead>
               <tr className="bg-gray-200 text-gray-800 text-lg font-semibold uppercase">
@@ -163,7 +179,7 @@ export default function OrdenesDeCompra() {
               ))}
             </tbody>
           </table>
-        }
+        )}
         <div className="flex justify-center mt-4">
           <button
             onClick={() => handlePageChange(page - 1)}
@@ -173,17 +189,22 @@ export default function OrdenesDeCompra() {
             <ChevronLeftIcon className="w-6 h-6" />
           </button>
           <div className="flex">
-            {
-              Array.from({ length: Math.ceil(filteredOrders.length / amount) }, (_, i) => i + 1).map((num) => (
-                <button
-                  key={num}
-                  onClick={() => handlePageChange(num)}
-                  className={`px-2 py-1 focus:outline-none ${num === page ? "bg-contrast text-white cursor-not-allowed" : "bg-secondary-bg hover:scale-125  cursor-pointer"}`}
-                >
-                  {num}
-                </button>
-              ))
-            }
+            {Array.from(
+              { length: Math.ceil(filteredOrders.length / amount) },
+              (_, i) => i + 1
+            ).map((num) => (
+              <button
+                key={num}
+                onClick={() => handlePageChange(num)}
+                className={`px-2 py-1 focus:outline-none ${
+                  num === page
+                    ? "bg-contrast text-white cursor-not-allowed"
+                    : "bg-secondary-bg hover:scale-125  cursor-pointer"
+                }`}
+              >
+                {num}
+              </button>
+            ))}
           </div>
           <button
             onClick={() => handlePageChange(page + 1)}
@@ -194,10 +215,20 @@ export default function OrdenesDeCompra() {
           </button>
         </div>
       </div>
-      {
-        (orderId !== 0) && <EditarOrdenDeCompra orderId={orderId} show={showEdit} setShow={setShowEdit} updateOrder={updateOrder} />
-      }
-      <CrearNuevaOrden show={showNew} setShow={setShowNew} createOrder={createOrder} selectOrder={selectOrder} />
+      {orderId !== 0 && (
+        <EditarOrdenDeCompra
+          orderId={orderId}
+          show={showEdit}
+          setShow={setShowEdit}
+          updateOrder={updateOrder}
+        />
+      )}
+      <CrearNuevaOrden
+        show={showNew}
+        setShow={setShowNew}
+        createOrder={createOrder}
+        selectOrder={selectOrder}
+      />
     </div>
-  )
+  );
 }

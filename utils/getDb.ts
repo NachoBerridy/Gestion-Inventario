@@ -1,4 +1,4 @@
-import { open, Database } from "sqlite";
+import { Database, open } from "sqlite";
 import sqlite3 from "sqlite3";
 
 let currentDb: Database<sqlite3.Database, sqlite3.Statement> | null = null;
