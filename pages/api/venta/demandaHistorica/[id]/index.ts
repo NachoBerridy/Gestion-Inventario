@@ -4,7 +4,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { DateTime } from "luxon";
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
-interface salesData {
+export interface salesData {
     id: number;
     name: string;
     quantity: number;
@@ -14,8 +14,8 @@ interface salesData {
 export interface SeparetedSales {
     salesInPeriod: salesData[];
     quantity: number;
-    periodStart?: DateTime;
-    periodEnd?: DateTime;
+    periodStart: DateTime;
+    periodEnd: DateTime;
 }
 
 export default async function handler(
