@@ -3,6 +3,7 @@ import {
   Legend,
   Line,
   LineChart,
+  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
@@ -19,7 +20,8 @@ export default function LinealChart( {formatedData }: {formatedData: DataLinealC
 
 
   return (
-    <div className="grafica bg-slate-200 p-4 rounded-lg  flex justify-center items-center">
+    <div className="grafica bg-white p-4 rounded-lg  flex justify-center items-center w-full h-full">
+      <ResponsiveContainer width="100%" height="100%">
         <LineChart
           width={500}
           height={400}
@@ -35,6 +37,7 @@ export default function LinealChart( {formatedData }: {formatedData: DataLinealC
           <Line type="monotone" dataKey="real" stroke="#BD2A2E" yAxisId={0} />
           <Line type="monotone" dataKey="prediccion" stroke="#2E86C1" yAxisId={0} />
         </LineChart>
+      </ResponsiveContainer>
     </div>
   );
 }

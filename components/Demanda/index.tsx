@@ -55,6 +55,15 @@ interface predictionParamsRL{
 
 }
 
+interface predictionsEST{
+  id: number; 
+  start_date: string;
+  end_date: string;
+  period: string;
+  cycle: string;
+  estimatedSales: number;
+}
+
 
 interface predictionParamsPM{
   historicalDemand: SeparetedSales[];
@@ -74,6 +83,9 @@ export default function Demanda() {
   const [periodName , setPeriodName] = useState<string>("meses");
   const [amounOfPeriods, setAmountOfPeriods] = useState<number>(1);
   const [period, setPeriod] = useState<string>(`${amounOfPeriods}-${periodNames[periodName as keyof typeof periodNames]}`); // 1-m
+  const [amontOfCycles, setAmountOfCycles] = useState<number>(1);
+  const [cycleName, setCycleName] = useState<string>("meses");
+  const [cycle, setCycle] = useState<string>(`${amontOfCycles}-${periodNames[cycleName as keyof typeof periodNames]}`); // 1-m
   const [startDate, setStartDate] = useState<string>("2021-01-01");
   const [endDate, setEndDate] = useState<string>(`${new Date().getFullYear()}-12-31`); // `2021-12-31
   const [id, setId] = useState<number>(1);
@@ -120,7 +132,7 @@ export default function Demanda() {
     });
 
     //set parameters for prediction
-    let params: predictionParamsPMPE | predictionParamsPMP | predictionParamsPM | predictionParamsRL = {} as any;
+    let params: predictionParamsPMPE | predictionParamsPMP | predictionParamsPM | predictionParamsRL | predictionsEST = {} as any;
     if (typeOfPrediction === "Promedio Movil Suavizado Exponencialmente") {
       params = {
         historicalDemand: response.data,
@@ -148,7 +160,16 @@ export default function Demanda() {
         historicalDemand: response.data,
         errorMetod: typeOfError,
       }
-    } 
+    }   else if (typeOfPrediction === "Estacionalidad") {
+      params = {
+        id: id,
+        start_date: startDate,
+        end_date: endDate,
+        period: period,
+        cycle: cycle,
+        estimatedSales: 0,
+      }
+    }
 
     const predictions = await getPrediction(params);
     setError(predictions.error);
@@ -179,7 +200,7 @@ export default function Demanda() {
     setFormatedData(newData);
   }
 
-  const getPrediction = async (params: predictionParamsPMPE | predictionParamsPMP | predictionParamsPM | predictionParamsRL) => {
+  const getPrediction = async (params: predictionParamsPMPE | predictionParamsPMP | predictionParamsPM | predictionParamsRL |predictionsEST) => {
     if (typeOfPrediction === "Promedio Movil Suavizado Exponencialmente") {
       const response = await axios.post(`/api/demanda/pmpe`, params);
       return response.data;
@@ -191,6 +212,9 @@ export default function Demanda() {
       return response.data;
     } else if (typeOfPrediction === "Regresión Lineal") {
       const response = await axios.post(`/api/demanda/regresionLineal`, params);
+      return response.data;
+    } else if (typeOfPrediction === "Estacionalidad") {
+      const response = await axios.post(`/api/demanda/estacionalidad`, params);
       return response.data;
     }
   }
@@ -384,14 +408,14 @@ export default function Demanda() {
           </div>
         </div>
       </div>
-      <div className="flex flex-col items-start justify-between h-5/6 gap-4 w-1/2">
-        <div className="  p-4 rounded-lg  flex justify-center items-start h-full ">
+      <div className="flex flex-col items-start justify-between h-full gap-4 w-1/2">
+        <div className="  p-4 rounded-lg  flex justify-center items-start h-5/6 w-full">
           {
             view === "chart" 
             ?
               <LinealChart formatedData={formatedData} />
             : 
-            <div className=" max-h-full w-full bg-white text-black p-4 rounded-lg overflow-auto">
+            <div className=" h-full w-full bg-white text-black p-4 rounded-lg overflow-auto">
               <Table data={formatedData} />
             </div>
           }
