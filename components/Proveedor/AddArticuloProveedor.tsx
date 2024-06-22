@@ -143,7 +143,7 @@ export default function AddArticuloProveedor({
           </tbody>
         </table>
 
-        {open && selectedArticulo && (
+        {open && selectedArticulo ? (
           <>
             <div className="relative flex py-5 items-center">
               <div className="flex-grow border-t border-gray-400"></div>
@@ -208,12 +208,20 @@ export default function AddArticuloProveedor({
               <button
                 className="rounded border-black border"
                 onClick={closeAddArticulo}
-                type="submit"
+                type="button"
               >
-                Cancel
+                Cancelar
               </button>
             </form>
           </>
+        ) : (
+          <button
+            className="rounded border-black border"
+            onClick={closeAddArticulo}
+            type="button"
+          >
+            Cancelar
+          </button>
         )}
       </div>
     </dialog>
