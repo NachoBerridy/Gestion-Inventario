@@ -74,7 +74,6 @@ export default function AddArticuloProveedor({
 
     const formData = new FormData(form);
     formData.append("articulo_id", selectedArticulo.toString());
-    formData.append("proveedor_id", selectedArticulo.toString());
 
     fetch(`/api/proveedores/${currentProveedorId}/articulo`, {
       method: form.method,

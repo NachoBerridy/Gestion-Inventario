@@ -6,7 +6,6 @@ const idSchema = z.coerce.number();
 
 export interface IArticuloProveedor {
   articulo_id: number;
-  proveedor_id: number;
   plazo_entrega: number;
   costo_pedido: number;
   //precio
@@ -18,7 +17,6 @@ export interface IArticuloProveedor {
 const articuloProveedorSchema = z
   .object({
     articulo_id: z.coerce.number().min(1),
-    proveedor_id: z.coerce.number().min(1),
     plazo_entrega: z.coerce.number().min(0),
     costo_pedido: z.coerce.number().min(0),
     precio_unidad: z.coerce.number().min(1),
@@ -45,9 +43,9 @@ const articuloProveedorSchema = z
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query; // id proveedor
-  const parsedId = idSchema.safeParse(id);
-  if (!parsedId.success) {
-    return res.status(422).json(parsedId.error);
+  const proveedorId = idSchema.safeParse(id);
+  if (!proveedorId.success) {
+    return res.status(422).json(proveedorId.error);
   }
 
   const articuloProveedor = articuloProveedorSchema.safeParse(req.body);
@@ -65,7 +63,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
         select 1 from proveedor where id = ?1
     )
   `,
-    [id]
+    [proveedorId.data]
   );
 
   if (existProveedor.length === 0) {
@@ -97,7 +95,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     `,
     {
       ":articulo_id": articuloProveedor.data.articulo_id,
-      ":proveedor_id": articuloProveedor.data.proveedor_id,
+      ":proveedor_id": proveedorId.data,
       ":plazo_entrega": articuloProveedor.data.plazo_entrega,
       ":costo_pedido": articuloProveedor.data.costo_pedido,
     }
