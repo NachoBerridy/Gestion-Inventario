@@ -1,7 +1,7 @@
 import AddArticuloProveedor from "@/components/Proveedor/AddArticuloProveedor";
 import CreateUpdateProveedor from "@/components/Proveedor/CreateUpdateProveedor";
 import Proveedor from "@/components/Proveedor/Proveedor";
-import { FormEvent, useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { IProveedor } from "../api/proveedores";
 
@@ -11,6 +11,7 @@ const PAGE_SIZE = 5;
 export default function Proveedores() {
   const [page, setPage] = useState<number>(1);
   const [query, setQuery] = useState<string>("");
+  const [search, setSearch] = useState<string>("");
   const [dialogData, setDialogData] = useState<{
     open: boolean;
     currentProveedor: IProveedor | null;
@@ -18,6 +19,14 @@ export default function Proveedores() {
     open: false,
     currentProveedor: null,
   });
+
+  useEffect(() => {
+    const updateQuery = setTimeout(() => {
+      setQuery(search);
+    }, 500);
+
+    return () => clearTimeout(updateQuery);
+  }, [search]);
 
   const [dialogDataAddArticulo, setDialogDataAddArticulo] = useState<{
     open: boolean;
@@ -52,16 +61,6 @@ export default function Proveedores() {
       if (action === "inc") return prev + 1;
       return prev - 1;
     });
-  }
-
-  function handleSearchSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const queryValue = formData.get("queryValue");
-    if (queryValue !== null) {
-      setQuery(queryValue.toString());
-    }
   }
 
   function openDialogCreate() {
@@ -106,35 +105,29 @@ export default function Proveedores() {
     <div className="p-10 w-full h-screen flex flex-col gap-3">
       <div className="text-center">PROVEEDORES</div>
       <div className="flex gap-3 flex-col p-1">
-        <form
-          className="flex gap-3"
-          method="post"
-          onSubmit={handleSearchSubmit}
-        >
+        <div className="flex gap-3">
           <input
-            name="queryValue"
-            defaultValue={query}
+            defaultValue={search}
             placeholder="Buscar..."
             className="w-full border-black border"
             autoFocus={true}
+            onChange={(e) => setSearch(e.currentTarget.value)}
           />
-          <button type="submit">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-6 hover:stroke-purple-500"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-              />
-            </svg>
-          </button>
-        </form>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="size-6 hover:stroke-purple-500"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+            />
+          </svg>
+        </div>
         <div>SELECTOR</div>
       </div>
       <div className="flex flex-col gap-10 overflow-auto">
