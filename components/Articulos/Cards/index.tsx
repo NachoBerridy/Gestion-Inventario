@@ -1,11 +1,9 @@
-import {Articulo} from "../../../pages/api/articulos"
-import { PlusIcon, PencilSquareIcon, TrashIcon} from "@heroicons/react/24/outline";
-import { useState,useEffect } from "react";
-import UpdateArticle from "../UpdateArticulo";
-import axios from "axios";
+import { CurrencyDollarIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { useEffect, useState } from "react";
+import { Articulo } from "../../../pages/api/articulos";
 
 
-export default function Card({articulo, deleteArticle,toggleUpdate,setId}: {articulo: Articulo, deleteArticle: (id: number) => void, toggleUpdate: () => void, setId: (id: number) => void}) {
+export default function Card({articulo, deleteArticle,toggleUpdate,setId, newSale}: {newSale:Function, articulo: Articulo, deleteArticle: (id: number) => void, toggleUpdate: () => void, setId: (id: number) => void}) {
     
     const [color, setColor] = useState<string>("white")
     const [show, setShow] = useState<boolean>(false)
@@ -40,39 +38,75 @@ export default function Card({articulo, deleteArticle,toggleUpdate,setId}: {arti
         changeColor()
     }, [articulo])
     
+    // return (
+    //     <div className="card m-2">
+    //         <div className=" border border-black p-2 m-2card-body flex gap-3 items-center justify-between" onClick={() => setShow(!show)}>
+    //             <div className="flex gap-3 items-center justify-between">
+
+    //                 <h5 className="card-title">{articulo.nombre}</h5>
+    //                 <span className="circle w-2 h-2 rounded-full min-w-2 min-h-2 block" style={{background: color}}></span>
+    //             </div>
+    //             <div className="flex gap-3 items-center">
+
+    //                 <PencilSquareIcon className="h-6 w-6 text-gray-500 cursor-pointer" onClick={update}/>
+    //                 {/* <PlusIcon className="h-6 w-6 text-gray-500 cursor-pointer" /> */}
+    //                 <TrashIcon className="h-6 w-6 text-gray-500 cursor-pointer"  onClick={() => setDeleteModal(true)}/>
+    //             </div>
+    //         </div>
+    //         {show &&
+    //         <div className="flex gap-3 items-center justify-between absolut bg-white rounded-b-md p-2">
+    //             <p>Stock: {articulo.stock}</p>
+    //             <p>Precio: {articulo.precio}</p>
+    //             <p>Stock de seguridad: {articulo.stock_seguridad ? articulo.stock_seguridad: "Sin Dato"}</p>
+    //             <p>Punto de Pedido: {articulo.punto_pedido? articulo.punto_pedido: "Sin Dato"}</p>
+    //             <p>lote optimo: {articulo.lote_optimo ? articulo.lote_optimo : "Sin Dato"}</p>
+    //             <p>Modelo: {articulo.modelo_inventario}</p>
+    //         </div>
+    //         }
+    //         {
+    //             deleteModal &&
+    //             <div className="modal flex check-delete fixed w-screen h-screen bg-gray-900 bg-opacity-50 top-0 left-0 z-50 justify-center items-center " onClick={() => setDeleteModal(false)}>
+    //                 <div className="modal-content bg-white w-1/3 h-fit p-4 rounded-md flex flex-col justify-start gap-2 items-center">
+    //                     <p>¿Estás seguro que deseas eliminar el articulo?</p>
+    //                     <div className="flex gap-3 items-center justify-around">
+    //                         <button className=" w-full p-2 bg-lime-800 text-white" onClick={() => deleteArticle(articulo.id)}>Si</button>
+    //                         <button className="w-full p-2 bg-red-800 text-white" onClick={() => setDeleteModal(false)}>No</button>
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         }
+    //     </div>
+    // );
     return (
-        <div className="card m-2">
-            <div className=" border border-black p-2 m-2card-body flex gap-3 items-center justify-between" onClick={() => setShow(!show)}>
-                <div className="flex gap-3 items-center justify-between">
-
-                    <h5 className="card-title">{articulo.nombre}</h5>
-                    <span className="circle w-2 h-2 rounded-full min-w-2 min-h-2 block" style={{background: color}}></span>
+        <div className="card m-2 rounded-lg shadow-lg border border-gray-300">
+            <div className="card-body flex gap-4 items-center justify-between p-3 bg-gray-100 rounded-t-lg cursor-pointer" onClick={() => setShow(!show)}>
+                <div className="flex gap-4 items-center">
+                    <h5 className="card-title text-base font-semibold">{articulo.nombre}</h5>
+                    <span className="circle w-4 h-4 rounded-full block" style={{background: color}}></span>
                 </div>
-                <div className="flex gap-3 items-center">
-
-                    <PencilSquareIcon className="h-6 w-6 text-gray-500 cursor-pointer" onClick={update}/>
-                    {/* <PlusIcon className="h-6 w-6 text-gray-500 cursor-pointer" /> */}
-                    <TrashIcon className="h-6 w-6 text-gray-500 cursor-pointer"  onClick={() => setDeleteModal(true)}/>
+                <div className="flex gap-4 items-center">
+                    <PencilSquareIcon className="h-6 w-6 text-blue-500 hover:text-blue-700 cursor-pointer" onClick={update}/>
+                    <TrashIcon className="h-6 w-6 text-red-500 hover:text-red-700 cursor-pointer" onClick={() => setDeleteModal(true)}/>
+                    <CurrencyDollarIcon className="h-6 w-6 text-green-500 hover:text-green-700 cursor-pointer" onClick={() => newSale(articulo.id)}/>
                 </div>
             </div>
             {show &&
-            <div className="flex gap-3 items-center justify-between absolut bg-white rounded-b-md p-2">
-                <p>Stock: {articulo.stock}</p>
-                <p>Precio: {articulo.precio}</p>
-                <p>Stock de seguridad: {articulo.stock_seguridad ? articulo.stock_seguridad: "Sin Dato"}</p>
-                <p>Punto de Pedido: {articulo.punto_pedido? articulo.punto_pedido: "Sin Dato"}</p>
-                <p>lote optimo: {articulo.lote_optimo ? articulo.lote_optimo : "Sin Dato"}</p>
-                <p>Modelo: {articulo.modelo_inventario}</p>
-            </div>
+                <div className="flex p-2 bg-white rounded-b-lg border-t border-gray-200 justify-between">
+                    <p>Stock: {articulo.stock}</p>
+                    <p>Precio: {articulo.precio}</p>
+                    <p>Stock de seguridad: {articulo.stock_seguridad ? articulo.stock_seguridad : "Sin Dato"}</p>
+                    <p>Punto de Pedido: {articulo.punto_pedido ? articulo.punto_pedido : "Sin Dato"}</p>
+                    <p>Lote óptimo: {articulo.lote_optimo ? articulo.lote_optimo : "Sin Dato"}</p>
+                    <p>Modelo: {articulo.modelo_inventario}</p>
+                </div>
             }
-            {
-                deleteModal &&
-                <div className="modal flex check-delete fixed w-screen h-screen bg-gray-900 bg-opacity-50 top-0 left-0 z-50 justify-center items-center " onClick={() => setDeleteModal(false)}>
-                    <div className="modal-content bg-white w-1/3 h-fit p-4 rounded-md flex flex-col justify-start gap-2 items-center">
-                        <p>¿Estás seguro que deseas eliminar el articulo?</p>
-                        <div className="flex gap-3 items-center justify-around">
-                            <button className=" w-full p-2 bg-lime-800 text-white" onClick={() => deleteArticle(articulo.id)}>Si</button>
-                            <button className="w-full p-2 bg-red-800 text-white" onClick={() => setDeleteModal(false)}>No</button>
+            {deleteModal &&
+                <div className="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" onClick={() => setDeleteModal(false)}>
+                    <div className="modal-content bg-white w-1/3 p-6 rounded-lg shadow-lg flex flex-col gap-4 items-center">
+                        <p className="text-lg font-medium">¿Estás seguro que deseas eliminar el artículo?</p>
+                        <div className="flex gap-4 w-full">
+                            <button className="w-full p-2 bg-green-600 text-white rounded-lg hover:bg-green-700" onClick={() => deleteArticle(articulo.id)}>Sí</button>
+                            <button className="w-full p-2 bg-red-600 text-white rounded-lg hover:bg-red-700" onClick={() => setDeleteModal(false)}>No</button>
                         </div>
                     </div>
                 </div>
