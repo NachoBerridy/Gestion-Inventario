@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { proveedrSchema } from ".";
 
-const idSchema = z.number();
+const idSchema = z.coerce.number();
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,7 +15,7 @@ export default async function handler(
 
   const { id } = req.query;
 
-  const parsedId = idSchema.safeParse(parseInt(id));
+  const parsedId = idSchema.safeParse(id);
 
   if (!parsedId.success) {
     return res.status(422).json(parsedId.error);

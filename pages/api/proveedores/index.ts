@@ -124,10 +124,10 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "GET") {
-    getHandler(req, res);
+    await getHandler(req, res);
   }
 
   if (req.method === "POST") {
-    postHandler(req, res);
+    await postHandler(req, res);
   }
 }

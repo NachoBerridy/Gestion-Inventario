@@ -10,14 +10,18 @@ export default function CreateUpdateProveedor({
   open: boolean;
   close: (refresh: boolean) => void;
 }) {
-  const dialog = useRef(null);
+  const dialog = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    if (open) {
-      dialog?.current?.showModal();
-    } else {
-      dialog?.current?.close();
+    if (!open) {
+      return;
     }
+
+    dialog?.current?.showModal();
+
+    return () => {
+      dialog?.current?.close();
+    };
   }, [open]);
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -112,7 +116,7 @@ export default function CreateUpdateProveedor({
           </button>
           <button
             type="button"
-            onClick={() => close()}
+            onClick={() => close(false)}
             className="rounded border-black border"
           >
             Cancelar

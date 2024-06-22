@@ -3,14 +3,16 @@ import { IProveedor } from "@/pages/api/proveedores";
 export default function Proveedor({
   proveedor,
   editAction,
+  addAction,
 }: {
   proveedor: IProveedor;
   editAction: () => void;
+  addAction: () => void;
 }) {
   return (
     <div className="flex gap-3 border border-black p-3 border-wid bg-white">
       <span className="grow">{proveedor.nombre}</span>
-      <span className="w-10 cursor-pointer">
+      <button className="w-10" onClick={addAction}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -25,7 +27,7 @@ export default function Proveedor({
             d="M12 4.5v15m7.5-7.5h-15"
           />
         </svg>
-      </span>
+      </button>
       <button className="w-10" onClick={editAction}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
