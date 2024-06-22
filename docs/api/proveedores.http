@@ -1,0 +1,19 @@
+@base-url = http://localhost:3000/api
+
+
+###
+GET {{base-url}}/proveedores
+
+
+###
+GET {{base-url}}/proveedores
+?pageSize=5
+&offset=0
+&query=2
+
+
+###
+POST {{base-url}}/proveedores
+Content-Type: text/html; charset=utf-8
+
+nombre=Facu&domicilio=facu&correo=test%40test.com&direccion=test
