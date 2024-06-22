@@ -6,7 +6,7 @@ interface DataInterface {
 
 export default function Table({ data } : { data: DataInterface[] }) {
     return (
-        <div className="overflow-y-hidden h-1/2 ">
+        <div className="overflow-y-auto h-full ">
             <table className="table-auto h-full w-full bg-white text-black">
                 <thead className="bg-gray-200">
                     <tr>

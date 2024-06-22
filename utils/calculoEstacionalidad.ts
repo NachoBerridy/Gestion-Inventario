@@ -148,8 +148,8 @@ const estimateSeasonalityIndex = (
   const seasonalIndex = averageSalesByPeriod.map((average) => average !== -1 ? average / averageSales : -1);
   const predictions = predictSalesByPeriod(seasonalIndex, estimatedSales , cyclesWithPeriods[0]);
   return {
+    cyclesWithPeriods,
     averageSalesByPeriod,
-    averageSales,
     seasonalIndex,
     predictions
   }

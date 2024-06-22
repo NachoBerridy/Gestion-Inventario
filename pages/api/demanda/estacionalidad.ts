@@ -44,7 +44,7 @@ export default async function handler(
       const typeOfCycle = cycle.split("-")[1];
 
       const seasonalIndex = calculoIndiceEstacionalidad(sales, typeOfPeriod, quantityPeriod, start_date, end_date, typeOfCycle, quantityCycle, estimatedSales);
-      res.status(200).json({ seasonalIndex });
+      res.status(200).json({ ...seasonalIndex });
 
   } catch (error:any) {
     res.status(500).json({ message: error.message });
