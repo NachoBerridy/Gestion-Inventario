@@ -16,7 +16,7 @@ export interface IArticulo {
 async function queryArticulos(
   limit: number = 10,
   offset: number = 0,
-  queryName: string | undefined
+  query: string | undefined
 ): Promise<{
   rows: IArticulo[];
   totalRows: number;
@@ -28,9 +28,19 @@ async function queryArticulos(
       await db.get<{ "count(id)": number }>(
         `
         select count(id) 
-        from articulo        
+        from articulo
+        where nombre like 
+          case
+            when ?1 is not null and length(?1) > 0 then concat('%',?1,'%')
+            else '%'
+          end 
+        or id like
+          case
+            when ?1 is not null and length(?1) > 0 then concat('%',?1,'%')
+            else '%'
+          end                             
         `,
-        [queryName]
+        [query]
       )
     )?.["count(id)"] ?? 0;
 
@@ -43,17 +53,17 @@ async function queryArticulos(
           when ?3 is not null and length(?3) > 0 then concat('%',?3,'%')
           else '%'
         end
+      or id like
+        case
+          when ?3 is not null and length(?3) > 0 then concat('%',?3,'%')
+          else '%'
+        end        
       order by nombre asc
       limit ?1 
       offset ?2
       `,
-    [limit, offset, queryName]
+    [limit, offset, query]
   );
-
-  console.log({
-    rows,
-    totalRows,
-  });
 
   return {
     rows,
@@ -90,5 +100,5 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  getHandler(req, res);
+  await getHandler(req, res);
 }

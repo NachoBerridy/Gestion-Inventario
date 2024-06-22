@@ -21,10 +21,10 @@ export default function Proveedores() {
 
   const [dialogDataAddArticulo, setDialogDataAddArticulo] = useState<{
     open: boolean;
-    currentProveedor: IProveedor | null;
+    currentProveedorId: number | null;
   }>({
     open: false,
-    currentProveedor: null,
+    currentProveedorId: null,
   });
 
   const { data, error, isLoading, mutate } = useSWR<{
@@ -88,16 +88,16 @@ export default function Proveedores() {
     }
   }
 
-  function addaArticulo(proveedor: IProveedor) {
+  function addaArticulo(proveedorId: number) {
     setDialogDataAddArticulo({
-      currentProveedor: proveedor,
+      currentProveedorId: proveedorId,
       open: true,
     });
   }
 
   function closeDialogAddArticulo() {
     setDialogDataAddArticulo({
-      currentProveedor: null,
+      currentProveedorId: null,
       open: false,
     });
   }
@@ -143,7 +143,7 @@ export default function Proveedores() {
             key={p.id}
             proveedor={p}
             editAction={() => openDialogUpdate(p)}
-            addAction={() => addaArticulo(p)}
+            addAction={() => addaArticulo(p.id)}
           />
         ))}
       </div>
@@ -156,7 +156,7 @@ export default function Proveedores() {
 
       <AddArticuloProveedor
         open={dialogDataAddArticulo.open}
-        currentProveedor={dialogDataAddArticulo.currentProveedor}
+        currentProveedorId={dialogDataAddArticulo.currentProveedorId}
         close={closeDialogAddArticulo}
       />
 
