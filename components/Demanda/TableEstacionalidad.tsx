@@ -31,7 +31,6 @@ export default function Table({
 }) {
   // Determina el número máximo de periodos en los ciclos
   const maxPeriods = Math.max(...cycles.map(cycle => cycle.periods.length));
-
   return (
     <div className="overflow-y-auto h-full">
       <table className="table-auto h-full w-full bg-white text-black">

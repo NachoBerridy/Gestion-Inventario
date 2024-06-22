@@ -14,6 +14,7 @@ import Table from "./Table";
 //   YAxis,
 // } from "recharts";
 import ModalPesos from "./pesosPMP";
+import TableEST from "./TableEstacionalidad";
 
 export interface DataLinealChart {
     periodo: string;
@@ -103,6 +104,10 @@ export default function Demanda() {
   const [weights, setWeights] = useState<number[]>(Array.from({length: backPeriods}, (_, i) => i + 1));
   const [selectWeights, setSelectWeights] = useState<boolean>(false);
   const [view, setView] = useState<string>("chart");
+  const [cycles, setCycles] = useState<{startDate: string | null, endDate: string | null, periods: SeparetedSales[]}[]>([]);
+  const [averageSalesByPeriod, setAverageSalesByPeriod] = useState<number[]>([]);
+  const [seasonalIndex, setSeasonalIndex] = useState<number[]>([]);
+  const [predictions, setPredictions] = useState<{startDate: string | null, endDate: string | null, sales: number}[]>([]);
 
   const getArticulos = async () => {
     //Get Articulos
@@ -167,8 +172,19 @@ export default function Demanda() {
         end_date: endDate,
         period: period,
         cycle: cycle,
-        estimatedSales: 0,
+        estimatedSales: 200,
       }
+    }
+
+    if (typeOfPrediction === "Estacionalidad") {
+      const response = await axios.post(`/api/demanda/estacionalidad`, params);
+      setCycles(response.data.cyclesWithPeriods);
+      setAverageSalesByPeriod(response.data.averageSalesByPeriod);
+      setSeasonalIndex(response.data.seasonalIndex);
+      setPredictions(response.data.predictions);
+      
+      // setFormatedData(newData);
+      return;
     }
 
     const predictions = await getPrediction(params);
@@ -237,6 +253,10 @@ export default function Demanda() {
     setPeriod(`${amounOfPeriods}-${periodNames[periodName as keyof typeof periodNames]}`);
   }, [amounOfPeriods, periodName]);
 
+  useEffect (() => {
+    setCycle(`${amontOfCycles}-${periodNames[cycleName as keyof typeof periodNames]}`);
+  }, [amontOfCycles, cycleName]);
+
   useEffect(() => {
     setWeights(Array.from({length: backPeriods}, (_, i) => i + 1));
   }, [backPeriods]);
@@ -244,6 +264,13 @@ export default function Demanda() {
   useEffect(() => {
     fetchData();
   }, [id, startDate, endDate, period, typeOfPrediction, typeOfError , allowedError, alfa, initialValue, backPeriods]);
+
+  useEffect(() => {
+    //if the type of prediction is estacionalidad, then we need to change the view
+    if (typeOfPrediction === "Estacionalidad") {
+      setView("tableEst");
+    }
+  }, [typeOfPrediction]);
 
   return (
     <div className="flex  items-start justify-between p-4 bg-gray-700 shadow-lg w-full h-full text-white">
@@ -312,6 +339,34 @@ export default function Demanda() {
                 </select>
               </div>
             </div>
+            {
+              typeOfPrediction === "Estacionalidad" &&
+              <div className="flex gap-2 items-center w-full justify-between">
+                <label htmlFor="period">Ciclo</label>
+                <div className="flex gap-1">
+
+                  <input 
+                    type="number" 
+                    id="period" 
+                    name="period" 
+                    value={amontOfCycles} 
+                    onChange={(e) => setAmountOfCycles(Number(e.target.value))} 
+                    className="w-16 rounded-lg py-1 px-2 focus:outline-none focus:ring-none focus:border-transparent text-black"
+                  />
+                  <select 
+                    name="periodName" 
+                    id="periodName" 
+                    onChange={(e) => setCycleName(e.target.value)} 
+                    value={cycleName}
+                    className="text-black w-20 rounded-lg py-1 px-2 focus:outline-none focus:ring-none focus:border-transparent"
+                  >
+                    {Object.keys(periodNames).map((key) => (
+                      <option key={key} value={key}>{key}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            }
             <div className="flex gap-2 items-center w-full justify-between">
               <label htmlFor="typeOfPrediction">Tipo de Predicción</label>
               <select 
@@ -324,6 +379,7 @@ export default function Demanda() {
                 <option value="Promedio Movil Ponderado">Promedio Movil Ponderado</option>
                 <option value="Promedio Movil">Promedio Movil</option>
                 <option value="Regresión Lineal">Regresión Lineal</option>
+                <option value="Estacionalidad">Estacionalidad</option>
               </select>
             </div>
             <div className="flex gap-2 items-center w-full justify-between">
@@ -375,36 +431,45 @@ export default function Demanda() {
                 </div>
               }
             </div>
-            <div className="flex gap-2 items-center w-full justify-between">
-              <label htmlFor="typeOfError">Tipo de Error</label>
-              <select 
-                name="typeOfError" 
-                id="typeOfError" 
-                onChange={(e) => setTypeOfError(e.target.value)} 
-                className="text-black w-60 rounded-lg py-1 px-2 focus:outline-none focus:ring-none focus:border-transparent"
-              >
-                <option value="MAD">MAD</option>
-                <option value="MSE">MSE</option>
-                <option value="MAPE">MAPE</option>
-              </select>
-            </div>
-            <div className="flex gap-2 items-center w-full justify-between">
-              <label htmlFor="allowedError">Error Permitido</label>
-              <input 
-                type="number" 
-                id="allowedError" 
-                name="allowedError" 
-                value={allowedError} 
-                onChange={(e) => setAllowedError(Number(e.target.value))} 
-                className="w-16 rounded-lg py-1 px-2 focus:outline-none focus:ring-none focus:border-transparent text-black"
-              />
-            </div>
-            <div className="flex gap-2 items-center w-full justify-between">
-                  <span className={`font-semibold p-2 rounded-lg ${colorsToError[error < allowedError ? 'DENTRO' : 'ENCIMA']}`} >
-                    {typeOfError}: {Math.round(error*100)/100 } { typeOfError == 'MAPE' ? "%" : null }
-                    </span>
-                  <span className="font-semibold p-2 bg-blue-500 rounded-lg">Predicción siguiente periodo: {nextPeriod}</span>
-            </div>
+            {
+              typeOfPrediction !== "Estacionalidad" &&
+              <div className="flex gap-2 items-center w-full justify-between">
+                <label htmlFor="typeOfError">Tipo de Error</label>
+                <select 
+                  name="typeOfError" 
+                  id="typeOfError" 
+                  onChange={(e) => setTypeOfError(e.target.value)} 
+                  className="text-black w-60 rounded-lg py-1 px-2 focus:outline-none focus:ring-none focus:border-transparent"
+                >
+                  <option value="MAD">MAD</option>
+                  <option value="MSE">MSE</option>
+                  <option value="MAPE">MAPE</option>
+                </select>
+              </div>
+            }
+            {
+              typeOfPrediction !== "Estacionalidad" &&
+              <div className="flex gap-2 items-center w-full justify-between">
+                <label htmlFor="allowedError">Error Permitido</label>
+                <input 
+                  type="number" 
+                  id="allowedError" 
+                  name="allowedError" 
+                  value={allowedError} 
+                  onChange={(e) => setAllowedError(Number(e.target.value))} 
+                  className="w-16 rounded-lg py-1 px-2 focus:outline-none focus:ring-none focus:border-transparent text-black"
+                />
+              </div>
+            }
+            {
+              typeOfPrediction !== "Estacionalidad" &&
+              <div className="flex gap-2 items-center w-full justify-between">
+                    <span className={`font-semibold p-2 rounded-lg ${colorsToError[error < allowedError ? 'DENTRO' : 'ENCIMA']}`} >
+                      {typeOfError}: {Math.round(error*100)/100 } { typeOfError == 'MAPE' ? "%" : null }
+                      </span>
+                    <span className="font-semibold p-2 bg-blue-500 rounded-lg">Predicción siguiente periodo: {nextPeriod}</span>
+              </div>
+            }
           </div>
         </div>
       </div>
@@ -415,19 +480,25 @@ export default function Demanda() {
             ?
               <LinealChart formatedData={formatedData} />
             : 
-            <div className=" h-full w-full bg-white text-black p-4 rounded-lg overflow-auto">
-              <Table data={formatedData} />
-            </div>
+              view === "table"
+            ?
+              <div className=" h-full w-full bg-white text-black p-4 rounded-lg overflow-auto">
+                <Table data={formatedData} />
+              </div>
+            :
+              <div className=" h-full w-full bg-white text-black p-4 rounded-lg overflow-auto">
+                <TableEST cycles={cycles} averageSalesByPeriod={averageSalesByPeriod} seasonalIndex={seasonalIndex} predictions={predictions} />
+              </div>
           }
         </div>
         {/*Buton to switch to table view*/}
         <div className="flex items-center">
-          <div className="bg-gray-200 rounded-lg p-1 flex relative w-40">
+          <div className="bg-gray-200 rounded-lg p-2 flex relative w-40">
             <div
-              className={`absolute top-1 bottom-1 left-1 rounded-lg bg-contrast transition-transform duration-300 ease-in-out ${
+              className={`absolute top-1 bottom-1 rounded-lg bg-stone-500 transition-transform duration-300 ease-in-out ${
                 view === "chart" ? "translate-x-0" : "translate-x-full"
               }`}
-              style={{ width: '50%' }}
+              style={{ width: '46%' }}
             ></div>
             <button
               onClick={() => setView("chart")}
