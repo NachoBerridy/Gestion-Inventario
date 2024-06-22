@@ -87,7 +87,7 @@ const demandaHistorica : SeparetedSales[] = [
 ]
 interface predictionDemand {
     prediction: number[];
-    nexPeriod: number;
+    nextPeriod: number;
     error: number;
 }
                 
@@ -134,8 +134,8 @@ export default async function handler(
      
 
         // // calcualar el proximo periodo con los ultimos backPeriods del historico
-        // let nexPeriod = historicalDemand.slice(-backPeriods).reduce((acc:number, period:SeparetedSales) => acc + period.quantity, 0) / backPeriods
-        // nexPeriod = Math.round(nexPeriod)
+        // let nextPeriod = historicalDemand.slice(-backPeriods).reduce((acc:number, period:SeparetedSales) => acc + period.quantity, 0) / backPeriods
+        // nextPeriod = Math.round(nextPeriod)
         // //agrego el periodo a las predicciones
         // for (let i = 0; i < prediction.length; i++) {
         //     prediction[i] = {
@@ -147,8 +147,8 @@ export default async function handler(
         // }
         // const predictionDemand = prediction.slice(backPeriods, prediction.length)
 
-        const {predictionDemand, nexPeriod, error} = getPredictionPM(historicalDemand, backPeriods, errorMetod)
-        return res.status(200).json({predictionDemand, nexPeriod, error})
+        const {prediction, nextPeriod, error} = getPredictionPM(historicalDemand, backPeriods, errorMetod)
+        return res.status(200).json({prediction, nextPeriod, error})
     }
     catch (error: any) {
         return res.status(500).json({ message: error.message });
@@ -183,8 +183,8 @@ export function getPredictionPM(historicalDemand:SeparetedSales[], backPeriods:n
  
 
     // calcualar el proximo periodo con los ultimos backPeriods del historico
-    let nexPeriod = historicalDemand.slice(-backPeriods).reduce((acc:number, period:SeparetedSales) => acc + period.quantity, 0) / backPeriods
-    nexPeriod = Math.round(nexPeriod)
+    let nextPeriod = historicalDemand.slice(-backPeriods).reduce((acc:number, period:SeparetedSales) => acc + period.quantity, 0) / backPeriods
+    nextPeriod = Math.round(nextPeriod)
     //agrego el periodo a las predicciones
     for (let i = 0; i < prediction.length; i++) {
         //@ts-ignore
@@ -196,5 +196,5 @@ export function getPredictionPM(historicalDemand:SeparetedSales[], backPeriods:n
         
     }
     const predictionDemand = prediction.slice(backPeriods, prediction.length)
-    return {predictionDemand, nexPeriod, error}
+    return {prediction: predictionDemand, nextPeriod, error}
 }

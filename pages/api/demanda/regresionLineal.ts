@@ -82,7 +82,7 @@ export default function handler(
         //     return Math.round(a + b * (index + 1));
         // });
 
-        // const nexPeriod = a + b * (n + 1);
+        // const nextPeriod = a + b * (n + 1);
         // let error = 0;
         // const real = historicalDemand.map((item:SeparetedSales) => item.quantity);
         // const predictions = prediction;
@@ -104,8 +104,8 @@ export default function handler(
         //     }
             
         // }
-        const {prediction, nexPeriod, error} = getPredictionRL(historicalDemand, errorMetod);
-        res.status(200).json({prediction, nexPeriod, error});
+        const {prediction, nextPeriod, error} = getPredictionRL(historicalDemand, errorMetod);
+        res.status(200).json({prediction, nextPeriod, error});
     }catch(error:any){
         res.status(500).json({message: error.message});
     }
@@ -130,7 +130,7 @@ export function getPredictionRL(historicalDemand:SeparetedSales[], errorMetod:st
         return Math.round(a + b * (index + 1));
     });
 
-    const nexPeriod = a + b * (n + 1);
+    const nextPeriod = a + b * (n + 1);
     let error = 0;
     const real = historicalDemand.map((item:SeparetedSales) => item.quantity);
     const predictions = prediction;
@@ -153,5 +153,5 @@ export function getPredictionRL(historicalDemand:SeparetedSales[], errorMetod:st
         }
         
     }
-    return {prediction, nexPeriod, error}
+    return {prediction,nextPeriod:  Math.round(nextPeriod), error}
 }

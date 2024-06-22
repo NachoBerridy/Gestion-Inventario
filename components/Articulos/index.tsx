@@ -23,11 +23,11 @@ export default function Articulos() {
 
     const filterArticlebyStock = (articulos: Articulo[], filter: string) => {
         if (filter === "stock seguridad") {
-            const filtered = articulos.filter((articulo) => articulo.stock <= articulo.stock_seguridad);
+            const filtered = articulos.filter((articulo) => articulo.stock <= (articulo.stock_seguridad ?? 0));
             return filtered;
         }
         if (filter === "punto pedido") {
-            const filtered = articulos.filter((articulo) => articulo.stock <= articulo.punto_pedido);
+            const filtered = articulos.filter((articulo) => articulo.stock <= (articulo.punto_pedido ?? 0));
             return filtered;
         }
         return articulos;

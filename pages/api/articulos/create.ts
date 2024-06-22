@@ -50,20 +50,7 @@ export default async function handler(
         
         return res.status(200).json({ id: result.lastID })
     }
-    if (!modeloInventario) modeloInventario = MODELOINVENTARIO;
-    //TODO AGREAGAR MODELO DE INVENTARIO
-    const result = await db.run(
-      `INSERT INTO Articulo (nombre, stock, modelo_inventario, costo_almacenamiento) VALUES (?, ?, ?)`,
-      [nombre, stock, modeloInventario, tasaRotacion]
-    );
-    const date = new Date();
-    const result2 = await db.run(
-      `INSERT INTO Articulo_Precio_Venta (precio, articulo_id, fecha_inicio) VALUES (?, ?, ?)`,
-      [precio, result.lastID, date.toISOString()]
-    );
-
-    return res.status(200).json({ id: result.lastID });
-  } catch (error: any) {
-    return res.status(500).json({ message: error.message });
-  }
+    catch (error: any) {
+        return res.status(500).json({ message: error.message });
+    }
 }

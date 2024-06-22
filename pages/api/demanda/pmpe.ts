@@ -87,7 +87,7 @@ const demandaHistorica : SeparetedSales[] = [
 ]
 interface predictionDemand {
     prediction: number[];
-    nexPeriod: number;
+    nextPeriod: number;
     error: number;
 }
                 
@@ -130,7 +130,7 @@ export default async function handler(
         // if (errorMetod === "MAPE"){
         //     error = meanAbsolutePercentageError(predictions, real)
         // }
-        // const nexPeriod = prediction[prediction.length -1]
+        // const nextPeriod = prediction[prediction.length -1]
         // prediction.pop()
         
         // //agrego el periodo a las predicciones
@@ -143,8 +143,8 @@ export default async function handler(
             
         // }
 
-        const {prediction, nexPeriod, error} = getPredictionPMPE(historicalDemand, alfa, initialValue, errorMetod)
-        return res.status(200).json({prediction, nexPeriod, error})
+        const {prediction, nextPeriod, error} = getPredictionPMPE(historicalDemand, alfa, initialValue, errorMetod)
+        return res.status(200).json({prediction, nextPeriod, error})
     }
     catch (error: any) {
         return res.status(500).json({ message: error.message });
@@ -172,7 +172,7 @@ export function getPredictionPMPE(historicalDemand:SeparetedSales[], alfa:number
     if (errorMetod === "MAPE"){
         error = meanAbsolutePercentageError(predictions, real)
     }
-    const nexPeriod = prediction[prediction.length -1]
+    const nextPeriod = prediction[prediction.length -1]
     prediction.pop()
     
     //agrego el periodo a las predicciones
@@ -185,5 +185,5 @@ export function getPredictionPMPE(historicalDemand:SeparetedSales[], alfa:number
         }
         
     }
-    return {prediction, nexPeriod, error}
+    return {prediction, nextPeriod, error}
 }

@@ -152,7 +152,7 @@ export default function Demanda() {
 
     const predictions = await getPrediction(params);
     setError(predictions.error);
-    setNextPeriod(predictions.nexPeriod);
+    setNextPeriod(predictions.nextPeriod);
     //@ts-ignore
     const predictionArray = predictions.prediction.map ((item) => {
       return item.prediction;
