@@ -6,7 +6,7 @@ interface SeparetedSales {
   periodEnd: string;
 }
 
-interface cyclesWithPeriods {
+export interface CyclesWithPeriods {
   startDate: string;
   endDate: string;
   periods: SeparetedSales[];
@@ -24,7 +24,7 @@ export default function Table({
   seasonalIndex,
   predictions
 }: {
-  cycles: cyclesWithPeriods[];
+  cycles: CyclesWithPeriods[];
   averageSalesByPeriod: number[];
   seasonalIndex: number[];
   predictions: preditionInterface[];

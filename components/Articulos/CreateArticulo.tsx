@@ -20,30 +20,100 @@ export default function CreateNewArticle ({toggleCreate,createArticle}:{ toggleC
     }
     
 
+    // return (
+    //     <div className="flex justify-center items-center h-screen w-screen fixed top-0 bottom-0 right-0 left-0 m-auto">
+    //         <div className="modal fixed w-screen h-screen bg-gray-900 bg-opacity-50 top-0 left-0 z-40" onClick={toggleCreate}>
+    //         </div>
+    //         <div className="w-1/2 bg-white p-4 rounded-lg shadow-lg z-50">
+    //             <h2 className="text-2xl font-bold text-center">Crear Artículo</h2>
+    //             <form className="flex flex-col gap-4">
+    //                 <label htmlFor="nombre">Nombre</label>
+    //                 <input type="text" name="nombre" id="nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} />
+    //                 <label htmlFor="stock">Stock</label>
+    //                 <input type="number" name="stock" id="stock" value={stock} onChange={(e) => setStock(parseInt(e.target.value))} />
+    //                 <label htmlFor="precio">Precio</label>
+    //                 <input type="number" step={0.01} min={0.01} name="precio" id="precio" value={precio} onChange={(e) => setPrecio(parseFloat(e.target.value))} />
+    //                 <label htmlFor="modelo_inventario">Modelo de Inventario</label>
+    //                 <select name="modelo_inventario" id="modelo_inventario" value={modelo_inventario} onChange={(e) => setModeloInventario(e.target.value)}>
+    //                     {inventaryOptions.map((option) => (
+    //                         <option key={option} value={option}>{option}</option>
+    //                     ))}
+    //                 </select>                    
+    //                 <label htmlFor="tasaRotacion">Tasa de Rotación</label>
+    //                 <input type="number" step={0.01} min={0.01} name="tasaRotacion" id="tasaRotacion" value={tasaRotacion} onChange={(e) => setTasaRotacion(parseFloat(e.target.value))} />
+    //                 <button className="bg-blue-500 text-white p-2 rounded-md" type="button" onClick={create}>Crear Artículo</button>
+    //             </form>
+    //         </div>
+    //     </div>
+    // )
     return (
         <div className="flex justify-center items-center h-screen w-screen fixed top-0 bottom-0 right-0 left-0 m-auto">
-            <div className="modal fixed w-screen h-screen bg-gray-900 bg-opacity-50 top-0 left-0 z-40" onClick={toggleCreate}>
-            </div>
-            <div className="w-1/2 bg-white p-4 rounded-lg shadow-lg z-50">
-                <h2 className="text-2xl font-bold text-center">Crear Artículo</h2>
+            <div className="modal fixed w-screen h-screen bg-gray-900 bg-opacity-50 top-0 left-0 z-40" onClick={toggleCreate}></div>
+            <div className="w-11/12 md:w-1/2 lg:w-1/3 bg-white p-6 rounded-lg shadow-lg z-50">
+                <h2 className="text-2xl font-bold text-center mb-6">Crear Artículo</h2>
                 <form className="flex flex-col gap-4">
-                    <label htmlFor="nombre">Nombre</label>
-                    <input type="text" name="nombre" id="nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} />
-                    <label htmlFor="stock">Stock</label>
-                    <input type="number" name="stock" id="stock" value={stock} onChange={(e) => setStock(parseInt(e.target.value))} />
-                    <label htmlFor="precio">Precio</label>
-                    <input type="number" step={0.01} min={0.01} name="precio" id="precio" value={precio} onChange={(e) => setPrecio(parseFloat(e.target.value))} />
-                    <label htmlFor="modelo_inventario">Modelo de Inventario</label>
-                    <select name="modelo_inventario" id="modelo_inventario" value={modelo_inventario} onChange={(e) => setModeloInventario(e.target.value)}>
+                    <label htmlFor="nombre" className="font-semibold">Nombre</label>
+                    <input
+                        type="text"
+                        name="nombre"
+                        id="nombre"
+                        value={nombre}
+                        onChange={(e) => setNombre(e.target.value)}
+                        className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <label htmlFor="stock" className="font-semibold">Stock</label>
+                    <input
+                        type="number"
+                        name="stock"
+                        id="stock"
+                        value={stock}
+                        onChange={(e) => setStock(parseInt(e.target.value))}
+                        className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <label htmlFor="precio" className="font-semibold">Precio</label>
+                    <input
+                        type="number"
+                        step={0.01}
+                        min={0.01}
+                        name="precio"
+                        id="precio"
+                        value={precio}
+                        onChange={(e) => setPrecio(parseFloat(e.target.value))}
+                        className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <label htmlFor="modelo_inventario" className="font-semibold">Modelo de Inventario</label>
+                    <select
+                        name="modelo_inventario"
+                        id="modelo_inventario"
+                        value={modelo_inventario}
+                        onChange={(e) => setModeloInventario(e.target.value)}
+                        className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
                         {inventaryOptions.map((option) => (
                             <option key={option} value={option}>{option}</option>
                         ))}
-                    </select>                    
-                    <label htmlFor="tasaRotacion">Tasa de Rotación</label>
-                    <input type="number" step={0.01} min={0.01} name="tasaRotacion" id="tasaRotacion" value={tasaRotacion} onChange={(e) => setTasaRotacion(parseFloat(e.target.value))} />
-                    <button className="bg-blue-500 text-white p-2 rounded-md" type="button" onClick={create}>Crear Artículo</button>
+                    </select>
+                    <label htmlFor="tasaRotacion" className="font-semibold">Tasa de Rotación</label>
+                    <input
+                        type="number"
+                        step={0.01}
+                        min={0.01}
+                        name="tasaRotacion"
+                        id="tasaRotacion"
+                        value={tasaRotacion}
+                        onChange={(e) => setTasaRotacion(parseFloat(e.target.value))}
+                        className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                        className="bg-blue-600 text-white p-3 rounded-md shadow-lg hover:bg-blue-700 transition duration-300"
+                        type="button"
+                        onClick={create}
+                    >
+                        Crear Artículo
+                    </button>
                 </form>
             </div>
         </div>
-    )
+    );
+    
 }
