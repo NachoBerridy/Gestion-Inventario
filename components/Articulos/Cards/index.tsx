@@ -10,18 +10,20 @@ export default function Card({articulo, deleteArticle,toggleUpdate,setId, newSal
     const [deleteModal, setDeleteModal] = useState<boolean>(false)
 
     //funcion para elegir color, si el stock esta por encima de punto de pedido verde, si está en el punto de pedido amarillo, si está por debajo pero por encima de stock de seguridad naranja, si está por debajo de stock de seguridad rojo
+    //TODO: revisar interaccion si stockAContabilizar < punto_pedido
     const changeColor = () => {
+        const stockAContabilizar = articulo.stock;
         switch (true) {
-            case articulo.punto_pedido && articulo.stock > articulo.punto_pedido:
+            case articulo.punto_pedido && stockAContabilizar > articulo.punto_pedido:
                 setColor("green")
                 break;
-            case articulo.punto_pedido && articulo.stock === articulo.punto_pedido:
+            case articulo.punto_pedido && stockAContabilizar === articulo.punto_pedido:
                 setColor("yellow")
                 break;
-            case  articulo.stock_seguridad && articulo.punto_pedido && articulo.stock < articulo.punto_pedido && articulo.stock > articulo.stock_seguridad:
+            case  articulo.stock_seguridad && articulo.punto_pedido && stockAContabilizar < articulo.punto_pedido && stockAContabilizar > articulo.stock_seguridad:
                 setColor("orange")
                 break;
-            case articulo.stock_seguridad && articulo.stock <= articulo.stock_seguridad:
+            case articulo.stock_seguridad && stockAContabilizar <= articulo.stock_seguridad:
                 setColor("red")
                 break;
             default:
@@ -93,6 +95,7 @@ export default function Card({articulo, deleteArticle,toggleUpdate,setId, newSal
             {show &&
                 <div className="flex p-2 bg-white rounded-b-lg border-t border-gray-200 justify-between">
                     <p>Stock: {articulo.stock}</p>
+                    <p>Stock Ingreso Pendiente: {articulo.stock_ingreso_pendiente ?? 0}</p>
                     <p>Precio: {articulo.precio}</p>
                     <p>Stock de seguridad: {articulo.stock_seguridad ? articulo.stock_seguridad : "Sin Dato"}</p>
                     <p>Punto de Pedido: {articulo.punto_pedido ? articulo.punto_pedido : "Sin Dato"}</p>

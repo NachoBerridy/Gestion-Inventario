@@ -25,10 +25,27 @@ export default async function handler(
         
 
         const articulos = await db.all(`
-            SELECT Articulo.id, nombre, stock, precio, stock_seguridad, punto_pedido, lote_optimo, modelo_inventario, tasa_rotacion FROM Articulo
-            join Articulo_Precio_Venta on Articulo.id = Articulo_Precio_Venta.articulo_id
+            SELECT a.id, 
+            	a.nombre, 
+            	a.stock,  
+            	a.stock_seguridad,
+            	a.punto_pedido, 
+            	a.lote_optimo, 
+            	a.modelo_inventario, 
+            	a.tasa_rotacion, 
+            	apv.precio,
+            	(select sum(oc.cantidad)
+            		from Articulo_Proveedor ap
+            		join Orden_Compra oc on oc.articulo_proveedor_id = ap.id
+            		join Orden_Compra_Estado oce on oce.orden_compra_id = oc.id
+            		where ap.id = a.id 
+            			and oce.estado = 'Pendiente' 
+            	) as 'stock_ingreso_pendiente'
+            FROM Articulo a
+            join Articulo_Precio_Venta apv  on a.id = apv.articulo_id
             where 
-                Articulo_Precio_Venta.fecha_fin is NULL
+            	apv.fecha_fin is NULL
+
             `);
         //If params is empty, return all articles with their data if not return only the article name and id
         if (params.get("onlyName") === "true") {
