@@ -64,18 +64,18 @@ export default function OrdenesDeCompra() {
       toast.success("Orden de compra creada exitosamente");
       fetchOrdenes();
       setShowNew(false);
-      send && sentOrder(order, orderId.data.lastID)
+      send && sendOrder(order, orderId.data.lastID)
     } catch (error) {
       toast.error("Error al crear la orden de compra");
     }
   };
 
-  const sentOrder = async (order: newOrder, orderId: number) => {
+  const sendOrder = async (order: newOrder, orderId: number) => {
     try{
       await axios.put("/api/ordenes/update", {
         ...order,
         id: orderId,
-        estado: "Enviado",
+        estado: "Enviada",
         fecha: new Date().toISOString().split("T")[0],
       })
       fetchOrdenes()
