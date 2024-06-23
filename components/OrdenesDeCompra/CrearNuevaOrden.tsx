@@ -1,9 +1,9 @@
-import { use, useEffect, useState } from "react";
-import axios from "axios";
 import { Articulo } from "@/pages/api/articulos";
-import { PlusIcon, PaperAirplaneIcon, CheckIcon } from "@heroicons/react/24/outline";
-import formatPrice from "@/utils/formatPrice";
 import { newOrder } from "@/pages/api/ordenes";
+import formatPrice from "@/utils/formatPrice";
+import { CheckIcon, PaperAirplaneIcon, PlusIcon } from "@heroicons/react/24/outline";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 export default function CrearNuevaOrden(
   {show, setShow, createOrder, selectOrder}:
@@ -71,14 +71,13 @@ export default function CrearNuevaOrden(
     createOrder(order, false);
   }
 
-  const handleCreateAndSend = async (e: React.FormEvent<HTMLFormElement>) =>{
+  const handleCreateAndSend = async (e: any) =>{
     e.preventDefault();
     createOrder(order, true);
   }
 
   const checkExistingOrders = async (article: number) => {
     const response = await axios.post("/api/ordenes/checkExistingOrders", {article});
-    console.log(response.data);
     if(response.data.message === "No hay ordenes pendientes") {
       setExistingOrder(null);
     } else {
@@ -184,7 +183,6 @@ export default function CrearNuevaOrden(
                     value={selectedProvider?.id}
                     key={selectedProvider?.id}
                     onChange={(e) => {
-                      console.log(e.target.value);
                       handleSelectProvider(parseInt(e.target.value));
                     }}
                   >
@@ -243,21 +241,21 @@ export default function CrearNuevaOrden(
               </div>
               <div className="flex justify-center w-full pt-2 gap-2">
                 <button
-                  className="bg-green-500 text-white p-2 rounded-md flex w-1/3 justify-center gap-1 cursor-pointer"
+                  className="bg-green-500 text-white p-2 rounded-md flex w-1/3 justify-center gap-1 cursor-pointer disabled:bg-gray-400"
                   type="submit"
+                  disabled = {!selectedArticle?.id || !order?.articuloProveedorId || order?.cantidad ===0}
                 >
                   <CheckIcon className="h-6 w-6" />
                   Crear
                 </button>
-                  <form onSubmit={handleCreateAndSend} className="w-1/3">
-                    <button
-                      type="submit"
-                      className="bg-blue-500 text-white p-2 rounded-md w-full flex justify-center gap-1 cursor-pointer"
-                    >
-                      <PaperAirplaneIcon className="h-6 w-6" />
-                      Crear y Enviar
-                    </button>
-                  </form>
+                <button
+                  className="bg-blue-500 text-white p-2 rounded-md w-1/3 flex justify-center gap-1 cursor-pointer disabled:bg-gray-400"
+                  onClick={handleCreateAndSend}
+                  disabled = {!selectedArticle?.id || !order?.articuloProveedorId || order?.cantidad ===0}
+                >
+                  <PaperAirplaneIcon className="h-6 w-6" />
+                  Crear y Enviar
+                </button>
               </div>
             </form>
           </div>

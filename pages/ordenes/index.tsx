@@ -44,7 +44,7 @@ export default function OrdenesDeCompra() {
       setFilteredOrders(response.data);
       setDisplayOrders(response.data.slice((page - 1) * amount, page * amount));
     } catch (error) {
-      console.error(error);
+      toast.error("Error al cargar las órdenes de compra")
     }
   };
 
@@ -55,27 +55,36 @@ export default function OrdenesDeCompra() {
       fetchOrdenes();
     } catch (error) {
       toast.error("Error al eliminar la orden de compra");
-      console.error(error);
     }
   };
 
   const createOrder = async (order: newOrder, send: boolean) => {
     try {
       const orderId = await axios.post("/api/ordenes/create", order);
-      send &&
-        (await axios.put("/api/ordenes/update", {
-          ...order,
-          id: orderId.data.id,
-          estado: "Enviado",
-          fecha: new Date().toISOString().split("T")[0],
-        }));
-      setShowNew(false);
-      fetchOrdenes();
       toast.success("Orden de compra creada exitosamente");
+      fetchOrdenes();
+      setShowNew(false);
+      send && sentOrder(order, orderId.data.lastID)
     } catch (error) {
       toast.error("Error al crear la orden de compra");
     }
   };
+
+  const sentOrder = async (order: newOrder, orderId: number) => {
+    try{
+      await axios.put("/api/ordenes/update", {
+        ...order,
+        id: orderId,
+        estado: "Enviado",
+        fecha: new Date().toISOString().split("T")[0],
+      })
+      fetchOrdenes()
+      toast.success("Orden de compra enviada exitosamente");
+    }
+    catch (error) {
+      toast.error("Error al enviar la orden de compra");
+    }
+  }
 
   const reciveOrder = async (
     id: number,

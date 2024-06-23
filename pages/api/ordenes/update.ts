@@ -1,8 +1,6 @@
-import sqlite3 from "sqlite3";
-import { Database, open } from "sqlite";
 import { NextApiRequest, NextApiResponse } from "next";
-import { IOrdenCompra } from "@/pages/api/ordenes";
-import { join } from "path";
+import { Database, open } from "sqlite";
+import sqlite3 from "sqlite3";
 
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
@@ -33,7 +31,6 @@ if (!db) {
     req.body.cantidad? order.cantidad = req.body.cantidad : order.cantidad;
     req.body.fecha? order.fecha = req.body.fecha : order.fecha;
     req.body.estado? order.estado = req.body.estado : order.estado;
-
     const { precioUnitario } = await db.get(
       "SELECT precio_unidad as precioUnitario FROM Precio WHERE articulo_proveedor_id = ? AND fecha_fin IS NULL",
       [order.articulo_proveedor_id]
