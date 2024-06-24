@@ -10,9 +10,8 @@ export default function Card({articulo, deleteArticle,toggleUpdate,setId, newSal
     const [deleteModal, setDeleteModal] = useState<boolean>(false)
 
     //funcion para elegir color, si el stock esta por encima de punto de pedido verde, si está en el punto de pedido amarillo, si está por debajo pero por encima de stock de seguridad naranja, si está por debajo de stock de seguridad rojo
-    //TODO: revisar interaccion si stockAContabilizar < punto_pedido
     const changeColor = () => {
-        const stockAContabilizar = articulo.stock;
+        const stockAContabilizar = articulo.stock + (articulo.stock_ingreso_pendiente ?? 0);
         switch (true) {
             case articulo.punto_pedido && stockAContabilizar > articulo.punto_pedido:
                 setColor("green")

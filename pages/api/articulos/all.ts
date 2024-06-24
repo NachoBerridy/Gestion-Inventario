@@ -39,7 +39,7 @@ export default async function handler(
             		join Orden_Compra oc on oc.articulo_proveedor_id = ap.id
             		join Orden_Compra_Estado oce on oce.orden_compra_id = oc.id
             		where ap.id = a.id 
-            			and oce.estado = 'Pendiente' 
+            			and oce.estado = 'Enviada' 
             	) as 'stock_ingreso_pendiente'
             FROM Articulo a
             join Articulo_Precio_Venta apv  on a.id = apv.articulo_id
