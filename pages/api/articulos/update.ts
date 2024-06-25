@@ -1,6 +1,6 @@
-import sqlite3 from "sqlite3";
-import { Database, open } from "sqlite";
 import { NextApiRequest, NextApiResponse } from "next";
+import { Database, open } from "sqlite";
+import sqlite3 from "sqlite3";
 
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
@@ -19,14 +19,9 @@ export default async function handler(
             return res.status(405).json({ message: "Method Not Allowed" });
         }
 
-        const { nombre, stock ,precio, id,modeloInventario,tasaRotacion}:{nombre:String, stock:Number,precio:Number, id:Number,modeloInventario:string,tasaRotacion:number} = req.body;
+        let { nombre, stock ,precio, id,modeloInventario,tasaRotacion,proveedor_id}:{nombre:String, stock:Number,precio:Number, id:Number,modeloInventario:string,tasaRotacion:number,proveedor_id:number} = req.body;
         !id && res.status(400).json({ message: "id is required" });
-        console.log("nombre",nombre);
-        console.log("stock",stock);
-        console.log("precio",precio);
-        console.log("id",id);
-        console.log("modeloInventario",modeloInventario);
-        console.log("tasaRotacion",tasaRotacion);
+    
         // const articulo = await db.all(`
         //     SELECT Articulo.id, nombre, stock, precio FROM Articulo
         //     join Articulo_Precio_Venta on Articulo.id = Articulo_Precio_Venta.articulo_id
@@ -37,7 +32,14 @@ export default async function handler(
         const articulo = await db.all(`SELECT * FROM Articulo 
         join Articulo_Precio_Venta on Articulo.id = Articulo_Precio_Venta.articulo_id
         where Articulo.id = ? and Articulo_Precio_Venta.fecha_fin is NULL`,[id]);
-        console.log("articulo",articulo);
+        nombre? nombre = nombre : nombre = articulo[0].nombre;
+        stock? stock = stock : stock = articulo[0].stock;
+        precio? precio = precio : precio = articulo[0].precio;
+        modeloInventario? modeloInventario = modeloInventario : modeloInventario = articulo[0].modelo_inventario;
+        tasaRotacion? tasaRotacion = tasaRotacion : tasaRotacion = articulo[0].tasa_rotacion;
+        proveedor_id? proveedor_id = proveedor_id : proveedor_id = articulo[0].proveedor_id;
+        
+
         if (articulo.length === 0) {
             return res.status(404).json({ message: `Articulo ${id} not found` });
         }
@@ -48,8 +50,8 @@ export default async function handler(
         }
 
         const result = await db.run(
-            "UPDATE Articulo SET nombre = ?, stock = ? ,modelo_inventario = ?, tasa_rotacion = ? WHERE id = ?",
-            [nombre, stock, modeloInventario, tasaRotacion, id]
+            "UPDATE Articulo SET nombre = ?, stock = ? ,modelo_inventario = ?, tasa_rotacion = ?, proveedor_id = ? WHERE id = ?",
+            [nombre, stock, modeloInventario, tasaRotacion, proveedor_id, id]
         );
 
         //si cambio el precio, se inserta un nuevo precio y se cierra el anterior
