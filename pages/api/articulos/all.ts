@@ -1,6 +1,6 @@
-import sqlite3 from "sqlite3";
-import { Database, open } from "sqlite";
 import { NextApiRequest, NextApiResponse } from "next";
+import { Database, open } from "sqlite";
+import sqlite3 from "sqlite3";
 
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
@@ -33,6 +33,7 @@ export default async function handler(
             	a.lote_optimo, 
             	a.modelo_inventario, 
             	a.tasa_rotacion, 
+                a.proveedor_id,
             	apv.precio,
             	(select sum(oc.cantidad)
             		from Articulo_Proveedor ap
@@ -45,12 +46,23 @@ export default async function handler(
             join Articulo_Precio_Venta apv  on a.id = apv.articulo_id
             where 
             	apv.fecha_fin is NULL
-
             `);
         //If params is empty, return all articles with their data if not return only the article name and id
         if (params.get("onlyName") === "true") {
             return res.status(200).json(articulos.map(articulo => ({ id: articulo.id, nombre: articulo.nombre })));
         }
+
+        for (const articulo of articulos) {
+            if (articulo.proveedor_id) {
+                const proveedor = await db.get(`
+                    SELECT nombre
+                    FROM Proveedor
+                    where id = ?
+                `, [articulo.proveedor_id]);
+                articulo.proveedor = proveedor.nombre;
+            }
+        }
+            
         return res.status(200).json(articulos);
     }
     catch (error: any) {
