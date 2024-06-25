@@ -9,4 +9,6 @@ export interface Articulo {
     stock_ingreso_pendiente: number | null
     modelo_inventario : string | null;
     lote_optimo : number | null;
+    proveedor_id : number | null;
+    proveedor : string | null;
 }

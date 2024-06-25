@@ -101,6 +101,7 @@ export default function Card({articulo, deleteArticle,toggleUpdate,setId, newSal
                     <p>Punto de Pedido: {articulo.punto_pedido ? articulo.punto_pedido : "Sin Dato"}</p>
                     <p>Lote óptimo: {articulo.lote_optimo ? articulo.lote_optimo : "Sin Dato"}</p>
                     <p>Modelo: {articulo.modelo_inventario}</p>
+                    {articulo.proveedor_id && <p>Proveedor: {articulo.proveedor}</p>}
                 </div>
             }
             {deleteModal &&
