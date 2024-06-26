@@ -121,8 +121,8 @@ export default async function handler(
     return res
       .status(200)
       .json(
-        getDemanda(
-          Number(),
+        await getDemanda(
+          Number(id),
           typePeriod,
           start_date,
           end_date,
