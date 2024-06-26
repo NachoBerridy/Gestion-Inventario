@@ -46,7 +46,8 @@ export const calcCGI = ({
   const costoCompra = costoArticulo * demandaAnual;
   const costoAlmacenamiento = costoAlmacenar * (loteOptimo / 2);
   const costoPedido = costoPedidoQ * (demandaAnual / loteOptimo);
+
   const CGI = costoCompra + costoAlmacenamiento + costoPedido;
-  const finalData = { CGI: CGI };
-  return finalData;
+
+  return CGI;
 };
