@@ -1,9 +1,9 @@
 import { calcCGI, calcInventario } from "@/components/Inventarios/Inventarios";
-import _ from "lodash";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Database, open } from "sqlite";
 import sqlite3 from "sqlite3";
 import { getDemanda } from "../venta/demandaHistorica/[id]";
+
 
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
@@ -59,7 +59,6 @@ export default async function handler(
           // start_date: `${new Date().getFullYear()}-01-01`,
           // end_date: `${new Date().getFullYear()}-12-31`,
         );
-        console.log(data);
         return data[0]?.quantity ?? 0;
       } catch (error) {
         throw new Error(`Failed to fetch demanda for id: ${id}`);
@@ -94,9 +93,14 @@ export default async function handler(
         costoPedidoQ: arti.costo_pedido,
       }),
     }));
+    
+    const articuloFinal =(()=>{
 
-    const articuloFinal = _.minBy(articulosWithCGI, "CGI");
-    console.log(articulosWithCGI);
+      const sortedByCGI = articulosWithCGI.sort((a,b)=>a['CGI']-b['CGI'])
+      return sortedByCGI[0]
+
+    })()     
+
     return res.status(200).json({ articulo: articuloFinal });
   } catch (error: any) {
     console.error("Error:", error.message);
