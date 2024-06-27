@@ -36,7 +36,7 @@ export default function CrearNuevaOrden(
 
   const getArticle = async (id: number) => {
     const response = await axios.get(`/api/articulos/${id}`);
-    setSelectedArticle(response.data[0]);
+    setSelectedArticle(response.data);
   }
 
   const getArticleProviders = async (id: number) => {
