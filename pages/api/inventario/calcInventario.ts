@@ -4,7 +4,6 @@ import { Database, open } from "sqlite";
 import sqlite3 from "sqlite3";
 import { getDemanda } from "../venta/demandaHistorica/[id]";
 
-
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
 export default async function handler(
@@ -31,13 +30,16 @@ export default async function handler(
       `SELECT 
             a.id, a.nombre,
             a.modelo_inventario,
-            a.tasa_rotacion, 
+            a.tasa_rotacion,
+            ap.id as articulo_proveedor_id,
             ap.plazo_entrega, 
             ap.costo_pedido, 
-            p.precio_unidad 
+            p.precio_unidad,
+            po.nombre as proveedor_nombre
         FROM Articulo a
         LEFT JOIN Articulo_Proveedor ap ON ap.articulo_id = a.id 
-        LEFT JOIN Precio p ON p.articulo_proveedor_id = ap.id 
+        LEFT JOIN Precio p ON p.articulo_proveedor_id = ap.id
+        LEFT JOIN Proveedor po on po.id =  ap.proveedor_id
         WHERE a.id = ? 
 	      AND p.fecha_fin IS NULL`,
       [idArticulo]
@@ -93,13 +95,11 @@ export default async function handler(
         costoPedidoQ: arti.costo_pedido,
       }),
     }));
-    
-    const articuloFinal =(()=>{
 
-      const sortedByCGI = articulosWithCGI.sort((a,b)=>a['CGI']-b['CGI'])
-      return sortedByCGI[0]
-
-    })()     
+    const articuloFinal = (() => {
+      const sortedByCGI = articulosWithCGI.sort((a, b) => a["CGI"] - b["CGI"]);
+      return sortedByCGI[0];
+    })();
 
     return res.status(200).json({ articulo: articuloFinal });
   } catch (error: any) {
