@@ -1,5 +1,4 @@
 import { calcCGI, calcInventario } from "@/components/Inventarios/Inventarios";
-import _ from "lodash";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Database, open } from "sqlite";
 import sqlite3 from "sqlite3";
@@ -31,13 +30,16 @@ export default async function handler(
       `SELECT 
             a.id, a.nombre,
             a.modelo_inventario,
-            a.tasa_rotacion, 
+            a.tasa_rotacion,
+            ap.id as articulo_proveedor_id,
             ap.plazo_entrega, 
             ap.costo_pedido, 
-            p.precio_unidad 
+            p.precio_unidad,
+            po.nombre as proveedor_nombre
         FROM Articulo a
         LEFT JOIN Articulo_Proveedor ap ON ap.articulo_id = a.id 
-        LEFT JOIN Precio p ON p.articulo_proveedor_id = ap.id 
+        LEFT JOIN Precio p ON p.articulo_proveedor_id = ap.id
+        LEFT JOIN Proveedor po on po.id =  ap.proveedor_id
         WHERE a.id = ? 
 	      AND p.fecha_fin IS NULL`,
       [idArticulo]
@@ -59,7 +61,6 @@ export default async function handler(
           // start_date: `${new Date().getFullYear()}-01-01`,
           // end_date: `${new Date().getFullYear()}-12-31`,
         );
-        console.log(data);
         return data[0]?.quantity ?? 0;
       } catch (error) {
         throw new Error(`Failed to fetch demanda for id: ${id}`);
@@ -95,8 +96,11 @@ export default async function handler(
       }),
     }));
 
-    const articuloFinal = _.minBy(articulosWithCGI, "CGI");
-    console.log(articulosWithCGI);
+    const articuloFinal = (() => {
+      const sortedByCGI = articulosWithCGI.sort((a, b) => a["CGI"] - b["CGI"]);
+      return sortedByCGI[0];
+    })();
+
     return res.status(200).json({ articulo: articuloFinal });
   } catch (error: any) {
     console.error("Error:", error.message);

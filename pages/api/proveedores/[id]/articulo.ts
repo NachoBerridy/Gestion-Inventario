@@ -18,8 +18,8 @@ const articuloProveedorSchema = z
   .object({
     articulo_id: z.coerce.number().min(1),
     plazo_entrega: z.coerce.number().min(0),
-    costo_pedido: z.coerce.number().min(0),
-    precio_unidad: z.coerce.number().min(1),
+    costo_pedido: z.coerce.number().min(0.01),
+    precio_unidad: z.coerce.number().min(0.01),
     cantidad_min: z.coerce
       .number()
       .nullable()
