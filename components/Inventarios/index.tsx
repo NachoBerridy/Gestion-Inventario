@@ -73,7 +73,7 @@ export default function Inventarios() {
       <div className="w-full h-full bg-white p-[20px_0_0_20px] flex flex-col text-[20px]">
         <span className="mt-[10px] h-[50px]">
           Lote Optimo :{" "}
-          {loteOptimo === 0 || isNaN(loteOptimo) ? "-" : Math.trunc(loteOptimo)}
+          {loteOptimo === 0 || isNaN(loteOptimo) ? "-" : loteOptimo}
         </span>
         <span className="mt-[10px] h-[50px]">
           Punto Pedido :{" "}

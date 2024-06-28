@@ -111,9 +111,9 @@ export default async function handler(
     const resultArticuloForUpdate = await db.run(
       "UPDATE Articulo SET lote_optimo = ?, stock_seguridad = ?, punto_pedido = ?, proveedor_id = ? WHERE id = ?",
       [
-        articuloFinal.CalculosInventario.loteOptimo,
-        articuloFinal.CalculosInventario.stockSeguridad,
-        articuloFinal.CalculosInventario.puntoPedido,
+        Math.round(articuloFinal.CalculosInventario.loteOptimo),
+        Math.round(articuloFinal.CalculosInventario.stockSeguridad),
+        Math.round(articuloFinal.CalculosInventario.puntoPedido),
         articuloFinal.idProveedor,
         idArticulo,
       ]

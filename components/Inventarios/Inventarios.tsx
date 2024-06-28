@@ -21,9 +21,9 @@ export const calcInventario = ({
   const stockSeguridad =
     factorSeguridadZ * desviacionEstandar * Math.sqrt(tiempoEntrega);
   const finalData = {
-    loteOptimo: loteOptimo,
-    puntoPedido: demandaDiaria * tiempoEntrega,
-    stockSeguridad: stockSeguridad,
+    loteOptimo: Math.round(loteOptimo),
+    puntoPedido: Math.round(demandaDiaria * tiempoEntrega + stockSeguridad),
+    stockSeguridad: Math.round(stockSeguridad),
   };
   return finalData;
 };
