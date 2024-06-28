@@ -6,17 +6,85 @@ import sqlite3 from "sqlite3";
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
 export interface salesData {
-    id: number;
-    name: string;
-    quantity: number;
-    date: string;
+  id: number;
+  name: string;
+  quantity: number;
+  date: string;
 }
 
 export interface SeparetedSales {
-    salesInPeriod: salesData[];
-    quantity: number;
-    periodStart: DateTime;
-    periodEnd: DateTime;
+  salesInPeriod: salesData[];
+  quantity: number;
+  periodStart: DateTime;
+  periodEnd: DateTime;
+}
+
+export async function getDemanda(
+  id: number,
+  typePeriod: string,
+  start_date: string,
+  end_date: string,
+  quantityPeriod: number,
+  db: Database
+): Promise<SeparetedSales[]> {
+  const sales: salesData[] = await db.all(
+    `
+          SELECT Venta.id as id, Articulo.nombre as name, Venta.cantidad as quantity, Venta.fecha as date FROM Venta
+          join Articulo on Venta.articulo_id = Articulo.id
+          where 
+              Venta.articulo_id = ?
+              and Venta.fecha >= ?
+              and Venta.fecha <= ?
+          order by Venta.fecha asc
+          `,
+    [id, start_date, end_date]
+  );
+  let separetedSales: SeparetedSales[];
+  // switch (typePeriod) {
+  //   case "d":
+  //     separetedSales = separeteByDays(
+  //       start_date,
+  //       end_date,
+  //       quantityPeriod,
+  //       sales
+  //     );
+  //     break;
+  //   case "w":
+  //     separetedSales = separeteByWeeks(
+  //       start_date,
+  //       end_date,
+  //       quantityPeriod,
+  //       sales
+  //     );
+  //     break;
+  //   case "m":
+  //     separetedSales = separeteByMonths(
+  //       start_date,
+  //       end_date,
+  //       quantityPeriod,
+  //       sales
+  //     );
+  //     break;
+  //   case "y":
+  //     separetedSales = separeteByYears(
+  //       start_date,
+  //       end_date,
+  //       quantityPeriod,
+  //       sales
+  //     );
+  //     break;
+  //   default:
+  //     separetedSales = [];
+  //     break;
+  // }
+  separetedSales = separateByPeriods(
+    typePeriod,
+    start_date,
+    end_date,
+    quantityPeriod,
+    sales
+  );
+  return separetedSales;
 }
 
 export default async function handler(
@@ -50,58 +118,19 @@ export default async function handler(
     const quantityPeriod = Number(period.split("-")[0]);
     const typePeriod = period.split("-")[1];
 
-    const sales: salesData[] = await db.all(
-      `
-            SELECT Venta.id as id, Articulo.nombre as name, Venta.cantidad as quantity, Venta.fecha as date FROM Venta
-            join Articulo on Venta.articulo_id = Articulo.id
-            where 
-                Venta.articulo_id = ?
-                and Venta.fecha >= ?
-                and Venta.fecha <= ?
-            order by Venta.fecha asc
-            `,
-      [id, start_date, end_date]
-    );
-    let separetedSales: SeparetedSales[];
-    // switch (typePeriod) {
-    //   case "d":
-    //     separetedSales = separeteByDays(
-    //       start_date,
-    //       end_date,
-    //       quantityPeriod,
-    //       sales
-    //     );
-    //     break;
-    //   case "w":
-    //     separetedSales = separeteByWeeks(
-    //       start_date,
-    //       end_date,
-    //       quantityPeriod,
-    //       sales
-    //     );
-    //     break;
-    //   case "m":
-    //     separetedSales = separeteByMonths(
-    //       start_date,
-    //       end_date,
-    //       quantityPeriod,
-    //       sales
-    //     );
-    //     break;
-    //   case "y":
-    //     separetedSales = separeteByYears(
-    //       start_date,
-    //       end_date,
-    //       quantityPeriod,
-    //       sales
-    //     );
-    //     break;
-    //   default:
-    //     separetedSales = [];
-    //     break;
-    // }
-    separetedSales = separateByPeriods(typePeriod, start_date, end_date, quantityPeriod, sales);
-    return res.status(200).json(separetedSales);
+    return res
+      .status(200)
+      .json(
+        await getDemanda(
+          Number(id),
+          typePeriod,
+          start_date,
+          end_date,
+          quantityPeriod,
+          db
+        )
+      );
+
     // return res.status(200).json({sales, quantity});
   } catch (error: any) {
     return res.status(500).json({ message: error.message });

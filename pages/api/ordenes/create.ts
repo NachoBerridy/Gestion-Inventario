@@ -1,6 +1,6 @@
-import sqlite3 from "sqlite3";
-import { Database, open } from "sqlite";
 import { NextApiRequest, NextApiResponse } from "next";
+import { Database, open } from "sqlite";
+import sqlite3 from "sqlite3";
 
 let db: Database<sqlite3.Database, sqlite3.Statement> | null = null;
 
@@ -24,12 +24,10 @@ if (!db) {
   }
   try {
     const { articuloProveedorId, cantidad, fechaOrden}: { articuloProveedorId: number, cantidad: number, fechaOrden: string } = req.body;
-    console.log(articuloProveedorId, cantidad, fechaOrden);
     const p = await db.get(
       "SELECT precio_unidad as precioUnitario FROM Precio WHERE articulo_proveedor_id = ? AND fecha_fin IS NULL",
       [articuloProveedorId]
     );
-    console.log(p);
     const precioUnitario = p.precioUnitario;
     const result = await db.run(
       "INSERT INTO Orden_Compra (articulo_proveedor_id, cantidad, total) VALUES (?, ?, ?)",

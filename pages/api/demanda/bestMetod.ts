@@ -42,8 +42,9 @@ export default async function handler(
         if (bestError === errorPMP.error){
             bestMetod = "Promedio Móvil Ponderado"
         }
-        return res.status(200).json("The best metod is: " + bestMetod);
+        return res.status(200).json(bestMetod);
     } catch (error:any) {
+        console.log(error);
         return res.status(500).json({ message: error.message });
     }
 }

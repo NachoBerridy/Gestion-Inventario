@@ -2,6 +2,15 @@
 -- https://www.sqlite.org/draft/datatype3.html
 -- Date en txt y iso format
 
+--PROVEEDOR
+create table if not exists Proveedor (
+    id integer primary key,
+    nombre text,
+    correo text,
+    telefono text,
+    direccion text
+);
+
 --ARTICULO
 create table if not exists Articulo (
     id integer primary key,
@@ -11,7 +20,9 @@ create table if not exists Articulo (
     punto_pedido integer,
     lote_optimo integer,
     tasa_rotacion float,
-    modelo_inventario text
+    modelo_inventario text,
+    proveedor_id integer,
+    foreign key (proveedor_id) references Proveedor(id)
 );
 
 --VENTA
@@ -44,14 +55,6 @@ create table if not exists Articulo_Precio_Venta (
     foreign key (articulo_id) references Articulo(id)
 );
 
---PROVEEDOR
-create table if not exists Proveedor (
-    id integer primary key,
-    nombre text,
-    correo text,
-    telefono text,
-    direccion text
-);
 
 --ARTICULO PROVEEDOR
 create table if not exists Articulo_Proveedor (

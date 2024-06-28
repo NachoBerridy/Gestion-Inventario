@@ -12,12 +12,12 @@ export default function PesosPMP( {setWeights, weights, setShow}: {setWeights: F
   return (
     <div className="flex flex-col items-center justify-center w-screen h-screen fixed text-black">
       <div 
-        className="bg-gray-700 opacity-50 w-screen h-screen fixed top-0 left-0 z-10"
+        className="bg-gray-700 opacity-50 w-screen h-screen fixed top-0 left-0 z-40"
         onClick={() => setShow(false)}
       >
 
         </div>
-      <div className="bg-white w-fit p-4 h-3/4 gap-4 z-20 rounded-lg shadow-lg min-w-fit overflow-auto">
+      <div className="bg-white w-fit p-4 h-3/4 gap-4 z-50 rounded-lg shadow-lg min-w-fit overflow-auto">
         <div className="flex flex-col justify-center items-center">
           <h1 className="text-2xl mb-4">Seleccionar Pesos</h1>
           <table className="table-auto border-collapse border border-gray-400">
