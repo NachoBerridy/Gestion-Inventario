@@ -24,8 +24,7 @@ export default function ModalBestOption({setShow , setBestMetod, historicalDeman
   // const [bestMetodData, setBestMetodData] = useState<string>(bestMetod);
 
   const validate = () => {
-    console.log(parameterBestMetod);
-    if (parameterBestMetod.alfa && parameterBestMetod.initialValue != undefined  && parameterBestMetod.initialValue != null && parameterBestMetod.periods && parameterBestMetod.ponderation?.length && parameterBestMetod.errorMetod && parameterBestMetod.ponderation?.length === parameterBestMetod.periods) {
+    if (parameterBestMetod.alfa && parameterBestMetod.initialValue != undefined  && parameterBestMetod.initialValue != null && parameterBestMetod.periods && parameterBestMetod.ponderation?.length && parameterBestMetod.errorMetod && parameterBestMetod.ponderation?.length == parameterBestMetod.periods) {
       setDisabled(false);
     } else {
       setDisabled(true);
@@ -64,7 +63,7 @@ export default function ModalBestOption({setShow , setBestMetod, historicalDeman
         initialValue: Number(parameterBestMetod.initialValue),
         errorMetod: parameterBestMetod.errorMetod,
         backPeriods: {
-          periods: parameterBestMetod.periods,
+          periods:Number(parameterBestMetod.periods),
           ponderation: parameterBestMetod.ponderation
         }
       });
