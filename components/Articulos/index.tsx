@@ -57,7 +57,7 @@ export default function Articulos() {
 
     const searchArticle = async (search: string, filter: string) => {
         const filtered = articulos.filter((articulo) =>
-            articulo.nombre.toLowerCase().includes(search.toLowerCase())
+            articulo?.nombre?.toLowerCase().includes(search.toLowerCase())
         );
         if (search === "") {
             setFilteredArticle(filterArticlebyStock(articulos, filter));
