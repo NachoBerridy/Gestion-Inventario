@@ -174,7 +174,7 @@ export default function AddArticuloProveedor({
                 name="costo_pedido"
                 type="number"
                 step="0.01"
-                min={0}
+                min={0.01}
               />
               <label>Precio por unidad ($):</label>
               <input
@@ -183,7 +183,7 @@ export default function AddArticuloProveedor({
                 name="precio_unidad"
                 type="number"
                 step="0.01"
-                min={1}
+                min={0.01}
               />
               <label>Cantidad minima de unidades:</label>
               <input

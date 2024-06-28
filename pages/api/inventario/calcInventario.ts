@@ -30,19 +30,23 @@ export default async function handler(
     const articulos = await db.all(
       `SELECT 
             a.id, a.nombre,
+            a.stock,
             a.modelo_inventario,
-            a.tasa_rotacion, 
+            a.tasa_rotacion,
+            ap.id as articulo_proveedor_id,
             ap.plazo_entrega, 
             ap.costo_pedido, 
+            pr.id as idProveedor,
+            pr.nombre as nombreProveedor,
             p.precio_unidad 
         FROM Articulo a
         LEFT JOIN Articulo_Proveedor ap ON ap.articulo_id = a.id 
+        LEFT JOIN Proveedor pr ON ap.proveedor_id = pr.id
         LEFT JOIN Precio p ON p.articulo_proveedor_id = ap.id 
         WHERE a.id = ? 
 	      AND p.fecha_fin IS NULL`,
       [idArticulo]
     );
-
     if (articulos.length === 0) {
       return res.status(404).json({ message: "Articulo not found" });
     }
@@ -52,14 +56,11 @@ export default async function handler(
         const data = await getDemanda(
           id,
           "y",
-          `${2022}-01-01`,
-          `${2022}-12-31`,
+          `${new Date().getFullYear()}-01-01`,
+          `${new Date().getFullYear()}-12-31`,
           1,
           db as Database
-          // start_date: `${new Date().getFullYear()}-01-01`,
-          // end_date: `${new Date().getFullYear()}-12-31`,
         );
-        console.log(data);
         return data[0]?.quantity ?? 0;
       } catch (error) {
         throw new Error(`Failed to fetch demanda for id: ${id}`);
@@ -75,7 +76,7 @@ export default async function handler(
           CalculosInventario: calcInventario({
             demandaAnual,
             tiempoEntrega: arti.plazo_entrega,
-            desviacionEstandar: 0,
+            // desviacionEstandar: 0,
             costoP: arti.costo_pedido,
             costoA: arti.precio_unidad * arti.tasa_rotacion,
             tipoInv: arti.modelo_inventario,
@@ -96,22 +97,28 @@ export default async function handler(
     }));
 
     const articuloFinal = _.minBy(articulosWithCGI, "CGI");
-    console.log(articulosWithCGI);
 
-  	const articuloForUpdate = await db.get(
-            `SELECT id FROM Articulo where id = ?`,
-            [id]
-        );
-        if (!articuloForUpdate) {
-            return res.status(404).json({ message: `Articulo ${id} not found` });
-        }
+    const articuloForUpdate = await db.get(
+      `SELECT id FROM Articulo where id = ?`,
+      [idArticulo]
+    );
+    if (!articuloForUpdate) {
+      return res
+        .status(404)
+        .json({ message: `Articulo ${idArticulo} not found` });
+    }
 
-       // const resultArticuloForUpdate = await db.run(
-       //     "UPDATE Articulo SET articulo_id = ?, lote_optimo = ?, stock_seguridad = ?, punto_pedido = ?, proveedor_id = ? WHERE id = ?",
-       //     [idArticulo, articuloFinal.loteOptimo, id]
-       // );
+    const resultArticuloForUpdate = await db.run(
+      "UPDATE Articulo SET lote_optimo = ?, stock_seguridad = ?, punto_pedido = ?, proveedor_id = ? WHERE id = ?",
+      [
+        articuloFinal.CalculosInventario.loteOptimo,
+        articuloFinal.CalculosInventario.stockSeguridad,
+        articuloFinal.CalculosInventario.puntoPedido,
+        articuloFinal.idProveedor,
+        idArticulo,
+      ]
+    );
 
-	  
     return res.status(200).json({ articulo: articuloFinal });
   } catch (error: any) {
     console.error("Error:", error.message);

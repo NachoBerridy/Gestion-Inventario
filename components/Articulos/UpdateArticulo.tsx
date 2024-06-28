@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Articulo } from "../../pages/api/articulos";
 
-export default function UpdateArticle ({toggleUpdate,updateArticle,id}:{ toggleUpdate: () => void, updateArticle: (nombre: string, stock: number, precio: number, modelo_inventario: string, tasaRotacion: number, id:number) => void, id: number}) {
+export default function UpdateArticle({ toggleUpdate, updateArticle, id }: { toggleUpdate: () => void, updateArticle: (nombre: string, stock: number, precio: number, modelo_inventario: string, tasaRotacion: number, id: number) => void, id: number }) {
     const [articulo, setArticulo] = useState<Articulo | null>(null);
     const [nombre, setNombre] = useState<string>("");
     const [stock, setStock] = useState<number>(0);
@@ -18,24 +18,24 @@ export default function UpdateArticle ({toggleUpdate,updateArticle,id}:{ toggleU
     const fetchData = async () => {
         try {
             const response = await axios.get(`/api/articulos/${id}`);
-            const articulo = response.data[0];
+            const articulo = response.data;
             setArticulo(articulo);
             setNombre(articulo.nombre);
             setStock(articulo.stock);
             setPrecio(articulo.precio);
             setModeloInventario(articulo.modelo_inventario);
             setTasaRotacion(articulo.tasa_rotacion);
-        } catch (error:any) {
+        } catch (error: any) {
             toast.error(error.response.data.message);
         }
     }
 
-    useEffect (() => {
+    useEffect(() => {
         fetchData();
     }, [id]);
 
     useEffect(() => {
-        
+
         fetchData();
     }, []);
 
@@ -46,11 +46,11 @@ export default function UpdateArticle ({toggleUpdate,updateArticle,id}:{ toggleU
     const update = async () => {
         try {
             await updateArticle(nombre, stock, precio, modelo_inventario, tasaRotacion, id);
-        } catch (error:any) {
+        } catch (error: any) {
 
         }
     }
-    
+
 
     // return (
     //     <div className="flex justify-center items-center h-screen w-screen fixed top-0 bottom-0 right-0 left-0 m-auto">
@@ -79,7 +79,7 @@ export default function UpdateArticle ({toggleUpdate,updateArticle,id}:{ toggleU
     //     </div>
     // )
 
-    return( 
+    return (
         <div className="flex justify-center items-center h-screen w-screen fixed top-0 left-0 z-50">
             <div className="modal fixed w-full h-full bg-gray-900 bg-opacity-50 top-0 left-0 z-40" onClick={toggleUpdate}></div>
             <div className="w-11/12 md:w-1/2 lg:w-1/3 bg-white p-6 rounded-lg shadow-lg z-50">
