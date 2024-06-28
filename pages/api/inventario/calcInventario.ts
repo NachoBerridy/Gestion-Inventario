@@ -97,6 +97,21 @@ export default async function handler(
 
     const articuloFinal = _.minBy(articulosWithCGI, "CGI");
     console.log(articulosWithCGI);
+
+  	const articuloForUpdate = await db.get(
+            `SELECT id FROM Articulo where id = ?`,
+            [id]
+        );
+        if (!articuloForUpdate) {
+            return res.status(404).json({ message: `Articulo ${id} not found` });
+        }
+
+       // const resultArticuloForUpdate = await db.run(
+       //     "UPDATE Articulo SET articulo_id = ?, lote_optimo = ?, stock_seguridad = ?, punto_pedido = ?, proveedor_id = ? WHERE id = ?",
+       //     [idArticulo, articuloFinal.loteOptimo, id]
+       // );
+
+	  
     return res.status(200).json({ articulo: articuloFinal });
   } catch (error: any) {
     console.error("Error:", error.message);
