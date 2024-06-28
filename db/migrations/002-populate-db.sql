@@ -132,7 +132,7 @@ INSERT INTO Proveedor (nombre, correo, telefono, direccion) VALUES
 
 -- Insertar datos en la tabla Articulo_Proveedor
 INSERT INTO Articulo_Proveedor (plazo_entrega, articulo_id, proveedor_id, costo_pedido) VALUES
-(5, 1, 1, 0.35),
+(25, 1, 1, 0.35),
 (7, 2, 2, 0.55),
 (10, 3, 3, 0.90),
 (3, 4, 4, 0.12),

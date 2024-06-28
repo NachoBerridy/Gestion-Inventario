@@ -21,7 +21,7 @@ create table if not exists Articulo (
     lote_optimo integer,
     tasa_rotacion float,
     modelo_inventario text,
-    proveedor_id,
+    proveedor_id integer,
     foreign key (proveedor_id) references Proveedor(id)
 );
 

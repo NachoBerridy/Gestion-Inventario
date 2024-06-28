@@ -3,29 +3,26 @@ export const calcInventario = ({
   tiempoEntrega, //articulo_prov
   costoP, //articulo_prov
   costoA, // precio_unidad * tasa_rota
-  desviacionEstandar, //demanda
+  // desviacionEstandar, //demanda
   tipoInv,
 }: {
   demandaAnual: any;
   tiempoEntrega: number;
   costoP: number;
   costoA: number;
-  desviacionEstandar: number;
+  // desviacionEstandar: number;
   tipoInv: string;
 }) => {
   const costo = costoP / costoA;
   const loteOptimo = Math.sqrt(2 * demandaAnual * costo);
   const factorSeguridadZ = 1.65;
-
+  const demandaDiaria = demandaAnual / 245;
+  const desviacionEstandar = demandaDiaria * 0.05;
   const stockSeguridad =
     factorSeguridadZ * desviacionEstandar * Math.sqrt(tiempoEntrega);
-  const demandaDiaria = demandaAnual / 245;
   const finalData = {
     loteOptimo: loteOptimo,
-    puntoPedido:
-      tipoInv === "LOTE FIJO"
-        ? demandaDiaria * tiempoEntrega + stockSeguridad
-        : 0,
+    puntoPedido: demandaDiaria * tiempoEntrega,
     stockSeguridad: stockSeguridad,
   };
   return finalData;
@@ -45,7 +42,10 @@ export const calcCGI = ({
 }) => {
   const costoCompra = costoArticulo * demandaAnual;
   const costoAlmacenamiento = costoAlmacenar * (loteOptimo / 2);
-  const costoPedido = costoPedidoQ * (demandaAnual / loteOptimo);
+  const costoPedido =
+    loteOptimo === 0 || demandaAnual == 0
+      ? 0
+      : costoPedidoQ * (demandaAnual / loteOptimo);
 
   const CGI = costoCompra + costoAlmacenamiento + costoPedido;
 

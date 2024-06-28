@@ -2,7 +2,6 @@ import { HomeIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
 export default function Navbar() {
-
   interface IPage {
     name: string;
     path: string;
@@ -54,15 +53,13 @@ export default function Navbar() {
           <span>Home</span>
         </div>
       </Link>
-      {
-        pages.map((page) => (
-          <Link key={page.path} href={page.path}>
-            <div className="flex items-center gap-3 p-3 font-semibold hover:bg-secondary-bg hover:text-black cursor-pointer">
-              <span>{page.name}</span>
-            </div>
-          </Link>
-        ))
-      }
+      {pages.map((page) => (
+        <Link key={page.path} href={page.path}>
+          <div className="flex items-center gap-3 p-3 font-semibold hover:bg-secondary-bg hover:text-black cursor-pointer">
+            <span>{page.name}</span>
+          </div>
+        </Link>
+      ))}
     </nav>
   );
 }
