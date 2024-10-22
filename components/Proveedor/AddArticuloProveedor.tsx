@@ -3,7 +3,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import useSWR from "swr";
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+const fetcher = (...args: [string, RequestInit?]) => fetch(...args).then((res) => res.json());
 
 export default function AddArticuloProveedor({
   currentProveedorId,

@@ -1,3 +1,4 @@
+/* eslint-disable react/react-in-jsx-scope */
 import AddArticuloProveedor from "@/components/Proveedor/AddArticuloProveedor";
 import CreateUpdateProveedor from "@/components/Proveedor/CreateUpdateProveedor";
 import Proveedor from "@/components/Proveedor/Proveedor";
@@ -5,7 +6,7 @@ import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { IProveedor } from "../api/proveedores";
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
+const fetcher = (...args: [string, RequestInit?]) => fetch(...args).then((res) => res.json());
 const PAGE_SIZE = 5;
 
 export default function Proveedores() {
