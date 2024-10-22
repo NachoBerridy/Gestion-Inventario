@@ -1,6 +1,6 @@
 # Gestor de inventario
 
-Este proyecto es un gestor de inventario que permite a los usuarios llevar un control de los productos que tienen en su inventario, así como también permite a los usuarios llevar un control de los productos que han vendido. En el marco de la clase de Investigación operativa, se busca implementar distintos métodos de optimización para mejorar la eficiencia del sistema.
+Este proyecto es un gestor de inventario que permite a los usuarios llevar un control de los productos que tienen en su inventario, así como también permite a los usuarios llevar un control de los productos que han vendido. En el marco de la clase de Investigación operativa, se busca implementar distintos métodos de optimización para mejorar la eficiencia del sistema. [DEMO](https://gestion-inventario-two.vercel.app/)
 
 # Tecnologías
 
