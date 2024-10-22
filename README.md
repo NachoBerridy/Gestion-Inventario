@@ -12,10 +12,10 @@ Este proyecto es un gestor de inventario que permite a los usuarios llevar un co
 
 # Equipo
 
-- [Antonella Aldao]()
-- [Facundo Lucero]()
-- [Facundo ]()
-- [Ignacio Berridy]()
+- [Antonella Aldao](https://github.com/AntoAldao)
+- [Facundo Lucero](https://github.com/facu-01)
+- [Facundo Yanzon](https://github.com/FYANZON)
+- [Ignacio Berridy](https://github.com/NachoBerridy)
 
 # Diagrama de clases
 
