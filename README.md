@@ -1,8 +1,140 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Gestor de inventario
 
-## Getting Started
+Este proyecto es un gestor de inventario que permite a los usuarios llevar un control de los productos que tienen en su inventario, así como también permite a los usuarios llevar un control de los productos que han vendido. En el marco de la clase de Investigación operativa, se busca implementar distintos métodos de optimización para mejorar la eficiencia del sistema.
 
-First, run the development server:
+# Tecnologías
+
+![Next.js](https://img.shields.io/badge/-Next.js-000000?logo=next.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/-React-61DAFB?logo=react&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/-Tailwind%20CSS-38B2AC?logo=tailwind-css&logoColor=white)
+![SQLite](https://img.shields.io/badge/-SQLite-003B57?logo=sqlite&logoColor=white)
+
+# Equipo
+
+- [Antonella Aldao]()
+- [Facundo Lucero]()
+- [Facundo ]()
+- [Ignacio Berridy]()
+
+# Diagrama de clases
+
+```mermaid
+erDiagram
+    Proveedor {
+        integer id PK
+        text nombre
+        text correo
+        text telefono
+        text direccion
+    }
+    Articulo {
+        integer id PK
+        text nombre
+        integer stock
+        integer stock_seguridad
+        integer punto_pedido
+        integer lote_optimo
+        float tasa_rotacion
+        text modelo_inventario
+        integer proveedor_id FK
+    }
+    Venta {
+        integer id PK
+        integer articulo_id FK
+        text fecha
+        integer precio
+        integer cantidad
+    }
+    Prediccion_Demanda {
+        integer id PK
+        integer articulo_id FK
+        text periodo
+        integer cantidad
+        text metodo
+    }
+    Articulo_Precio_Venta {
+        integer id PK
+        integer articulo_id FK
+        float precio
+        text fecha_inicio
+        text fecha_fin
+    }
+    Articulo_Proveedor {
+        integer id PK
+        integer plazo_entrega
+        integer articulo_id FK
+        integer proveedor_id FK
+        float costo_pedido
+    }
+    Precio {
+        integer id PK
+        integer articulo_proveedor_id FK
+        float precio_unidad
+        integer cantidad_min
+        integer cantidad_max
+        text fecha_inicio
+        text fecha_fin
+    }
+    Historial_Calculo {
+        integer id PK
+        integer articulo_proveedor_id FK
+        text tipo_inventario
+        integer lote_optimo
+        integer punto_optimo
+        integer stock_seguridad
+        text fecha
+        integer demanda
+    }
+    Orden_Compra {
+        integer id PK
+        integer articulo_proveedor_id FK
+        integer cantidad
+        integer total
+    }
+    Orden_Compra_Estado {
+        integer id PK
+        integer orden_compra_id FK
+        text estado
+        text fecha
+    }
+    Configuracion {
+        integer id PK
+        text valor
+    }
+
+    Proveedor ||--o{ Articulo: "provee"
+    Articulo ||--o{ Venta: "se vende en"
+    Articulo ||--o{ Prediccion_Demanda: "tiene predicciones"
+    Articulo ||--o{ Articulo_Precio_Venta: "tiene precios de venta"
+    Articulo ||--o{ Articulo_Proveedor: "se provee por"
+    Articulo_Proveedor ||--o{ Precio: "tiene precios"
+    Articulo_Proveedor ||--o{ Historial_Calculo: "tiene historial de cálculos"
+    Articulo_Proveedor ||--o{ Orden_Compra: "se ordena en"
+    Orden_Compra ||--o{ Orden_Compra_Estado: "tiene estados"
+```
+
+## Instrucciones de uso
+
+Primero, clona el repositorio:
+
+```bash
+git clone https://github.com/NachoBerridy/Gestion-Inventario.git
+```
+
+Instala las dependencias:
+
+```bash
+cd Gestion-Inventario
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+Luego, corre el servidor de desarrollo:
+
 
 ```bash
 npm run dev
@@ -13,28 +145,3 @@ pnpm dev
 # or
 bun dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
